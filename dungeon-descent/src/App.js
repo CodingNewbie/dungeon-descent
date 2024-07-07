@@ -1,44 +1,59 @@
-// src/App.js
-import React, { useState, useEffect, useRef } from 'react';
-import './styles/App.css';
+// src/App.jsx
+import React, { useState, useEffect, useRef } from "react";
+import { createCharacter } from "./components/Character";
+import { Floor } from "./components/Floor"; // Import the Floor class
+import "./styles/App.css";
 
 function App() {
   const [events, setEvents] = useState([]);
+  const [character, setCharacter] = useState(createCharacter(""));
+  const [floor, setFloor] = useState(new Floor());
+
+  const handleCreateCharacter = () => {
+    const newCharacter = createCharacter("Bob");
+    setCharacter(newCharacter);
+  };
+
   const eventsEndRef = useRef(null);
-
-  const messages = [
-    "There is nothing in this area.",
-    "You found a corpse.",
-    "You found a door.",
-    "You moved to the next floor.",
-    "You explored and found nothing.",
-    "You found an empty chest.",
-    "You encountered a Goblin.",
-    "You encountered an Orc.",
-    "You encountered a Skeleton Archer."
-  ];
-
-  useEffect(() => {
-    eventsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [events]);
+  const MAX_EVENTS = 50;
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const randomMessage = messages[Math.floor(Math.random() * messages.length)];
-      setEvents(prevEvents => [...prevEvents, randomMessage]);
+      const encounterMessage = floor.get_encounter();
+      setEvents((prevEvents) => {
+        const updatedEvents = [...prevEvents, encounterMessage];
+        if (updatedEvents.length > MAX_EVENTS) {
+          updatedEvents.shift();
+        }
+        return updatedEvents;
+      });
     }, 500);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [floor]);
+
+  useEffect(() => {
+    if (eventsEndRef.current) {
+      eventsEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [events]);
 
   return (
     <div className="App">
       <header className="App-header">
         <h1>Dungeon Descent</h1>
       </header>
+      <button onClick={handleCreateCharacter}>Create Character</button>
+      <p>{character.name}</p>
+      
+      <div className="Info-container">
+        <p>{floor.floor_name()}</p>
+      </div>
       <div className="Events-container">
         {events.map((event, index) => (
-          <div key={index} className="Event">{event}</div>
+          <div key={index} className="Event">
+            {event}
+          </div>
         ))}
         <div ref={eventsEndRef} />
       </div>
