@@ -4,6 +4,8 @@ import { createCharacter } from './components/Character';
 import { Floor } from './components/Floor'; // Import the Floor class
 import { Stats, StatsDisplay, BonusStatsDisplay } from './components/Stats'; // Import Stats, StatsDisplay, and BonusStatsDisplay
 import './styles/App.css';
+import '@fortawesome/fontawesome-free/css/all.min.css';
+
 
 function App() {
   const [events, setEvents] = useState([]);
@@ -28,7 +30,13 @@ function App() {
 
   const handleChestOpen = () => {
     const roll = Math.random();
-    const result = roll < 0.5 ? 'The chest is empty.' : 'You found 100 gold.';
+    const result = roll < 0.5 ? (
+      'The chest is empty.'
+    ) : (
+      <>
+        You found <i className="fa-solid fa-coins" style={{ color: '#FFD43B' }}></i> 100 gold.
+      </>
+    );
     setEvents((prevEvents) => [...prevEvents, result]);
     setLockedChest(false);
     setChestInteraction(null);
@@ -68,6 +76,7 @@ function App() {
       ...prevEvents,
       'You ignored it and decided to move on.'
     ]);
+    floor.encounterCount = 0;
     setFoundDoor(false);
     setDoorInteraction(null);
   };
