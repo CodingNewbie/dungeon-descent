@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/dungeon-descent/static/css/main.3a037cac.css",
+    "main.js": "/dungeon-descent/static/js/main.7f853a30.js",
+    "static/js/453.ec0a8669.chunk.js": "/dungeon-descent/static/js/453.ec0a8669.chunk.js",
+    "index.html": "/dungeon-descent/index.html",
+    "main.3a037cac.css.map": "/dungeon-descent/static/css/main.3a037cac.css.map",
+    "main.7f853a30.js.map": "/dungeon-descent/static/js/main.7f853a30.js.map",
+    "453.ec0a8669.chunk.js.map": "/dungeon-descent/static/js/453.ec0a8669.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.3a037cac.css",
+    "static/js/main.7f853a30.js"
+  ]
+}
