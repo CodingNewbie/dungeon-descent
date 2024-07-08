@@ -8,60 +8,65 @@ class Floor {
     this.encounter_count = 0;
     this.room_count = 0;
   }
-  
+
   set_depth(depth) {
     this.depth = depth;
   }
-  
+
   floor_name() {
     return "Floor " + String(this.depth);
   }
-  
+
   progress_encounters() {
     this.encounter_count++;
   }
-  
+
   change_rooms() {
     this.room_count++;
     this.encounter_count = 0;
+    console.log(`Room changed: ${this.room_count}`);
   }
-  
+
   change_floors() {
     this.depth++;
     this.room_count = 0;
     this.encounter_count = 0;
   }
-  
+
   handle_chest() {
-    return "You found a chest.";
+    const roll = Math.random();
+    if (roll < 0.5) {
+      return "You found an empty chest.";
+    } else {
+      return "You found a locked chest.";
+    }
   }
-  
+
   handle_mob() {
     return "You encountered a Goliath Nightmare Horned World-ender.";
   }
-  
+
   handle_corpse() {
     return "You found the corpse of Mitch McConnell.";
   }
-  
+
   handle_nothing() {
     return "You found nothing.";
   }
-  
+
   handle_special() {
     return "You found something awesome, like legit super cool.";
   }
-  
+
   handle_door() {
-    this.change_rooms();
     return "You found a door.";
   }
-  
+
   handle_new_floor() {
     this.change_floors();
     return "You moved to the next floor.";
   }
-  
+
   get_encounter() {
     if (this.encounter_count !== MAX_ENCOUNTER_COUNT) {
       this.progress_encounters();
