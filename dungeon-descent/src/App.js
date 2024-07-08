@@ -1,7 +1,7 @@
 // src/App.jsx
 import React, { useState, useEffect, useRef } from "react";
 import { createCharacter } from "./components/Character";
-import { Floor } from "./components/Floor"; // Import the Floor class
+import { Floor } from "./components/Floor";
 import "./styles/App.css";
 
 function App() {
@@ -14,6 +14,7 @@ function App() {
   const [doorInteraction, setDoorInteraction] = useState(null);
   const [currentFloor, setCurrentFloor] = useState(1);
   const [currentRoom, setCurrentRoom] = useState(1);
+  const [isBossRoom, setIsBossRoom] = useState(false);
 
   const handleCreateCharacter = () => {
     const newCharacter = createCharacter("Bob");
@@ -38,10 +39,18 @@ function App() {
   };
 
   const handleDoorOpen = () => {
-    floor.change_rooms();
-    console.log(`Current room after change_rooms: ${floor.room_count}`);
-    setCurrentRoom(floor.room_count);
-    setEvents((prevEvents) => [...prevEvents, "You opened the door and entered a new room."]);
+    if (isBossRoom) {
+      floor.changeFloors();
+      setCurrentFloor(floor.depth);
+      setCurrentRoom(1);
+      setIsBossRoom(false);
+      setEvents((prevEvents) => [...prevEvents, "You entered the boss room and moved to the next floor."]);
+    } else {
+      floor.changeRooms();
+      console.log(`Current room after changeRooms: ${floor.roomCount}`);
+      setCurrentRoom(floor.roomCount);
+      setEvents((prevEvents) => [...prevEvents, "You opened the door and entered a new room."]);
+    }
     setFoundDoor(false);
     setDoorInteraction(null);
   };
@@ -55,17 +64,21 @@ function App() {
   useEffect(() => {
     if (!lockedChest && !foundDoor) {
       const interval = setInterval(() => {
-        const encounterMessage = floor.get_encounter();
+        const encounterMessage = floor.getEncounter();
         if (encounterMessage === "You found a locked chest.") {
           setLockedChest(true);
           setChestInteraction(encounterMessage);
         } else if (encounterMessage === "You found a door.") {
           setFoundDoor(true);
           setDoorInteraction(encounterMessage);
+        } else if (encounterMessage === "You found the door to the boss room.") {
+          setFoundDoor(true);
+          setDoorInteraction(encounterMessage);
+          setIsBossRoom(true);
         } else {
           if (encounterMessage === "You moved to the next floor.") {
             setCurrentFloor(floor.depth);
-            setCurrentRoom(floor.room_count);
+            setCurrentRoom(floor.roomCount);
           }
           setEvents((prevEvents) => {
             const updatedEvents = [...prevEvents, encounterMessage];
@@ -76,7 +89,7 @@ function App() {
           });
         }
       }, 500);
-  
+
       return () => clearInterval(interval);
     }
   }, [floor, lockedChest, foundDoor]);
@@ -114,8 +127,8 @@ function App() {
         )}
         {doorInteraction && (
           <div className="Door-interaction">
-            <p>{doorInteraction}</p>
-            <button onClick={handleDoorOpen}>Open the door</button>
+            <p style={isBossRoom ? { color: "red" } : {}}>{doorInteraction}</p>
+            <button onClick={handleDoorOpen}>Enter</button>
             <button onClick={handleDoorIgnore}>Ignore</button>
           </div>
         )}

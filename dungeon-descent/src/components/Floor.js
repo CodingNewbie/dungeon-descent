@@ -5,35 +5,35 @@ const MAX_ROOM_COUNT = 5;
 class Floor {
   constructor() {
     this.depth = 1;
-    this.encounter_count = 0;
-    this.room_count = 1;
+    this.encounterCount = 0;
+    this.roomCount = 1;
   }
 
-  set_depth(depth) {
+  setDepth(depth) {
     this.depth = depth;
   }
 
-  floor_name() {
+  floorName() {
     return "Floor " + String(this.depth);
   }
 
-  progress_encounters() {
-    this.encounter_count++;
+  progressEncounters() {
+    this.encounterCount++;
   }
 
-  change_rooms() {
-    this.room_count++;
-    this.encounter_count = 0;
-    console.log(`Room changed: ${this.room_count}`);
+  changeRooms() {
+    this.roomCount++;
+    this.encounterCount = 0;
+    console.log(`Room changed: ${this.roomCount}`);
   }
 
-  change_floors() {
+  changeFloors() {
     this.depth++;
-    this.room_count = 0;
-    this.encounter_count = 0;
+    this.roomCount = 1;
+    this.encounterCount = 0;
   }
 
-  handle_chest() {
+  handleChest() {
     const roll = Math.random();
     if (roll < 0.5) {
       return "You found an empty chest.";
@@ -42,55 +42,55 @@ class Floor {
     }
   }
 
-  handle_mob() {
+  handleMob() {
     return "You encountered a Goliath Nightmare Horned World-ender.";
   }
 
-  handle_corpse() {
+  handleCorpse() {
     return "You found the corpse of Mitch McConnell.";
   }
 
-  handle_nothing() {
+  handleNothing() {
     return "You found nothing.";
   }
 
-  handle_special() {
+  handleSpecial() {
     return "You found something awesome, like legit super cool.";
   }
 
-  handle_door() {
-    return "You found a door.";
+  handleDoor() {
+    if (this.roomCount === MAX_ROOM_COUNT) {
+      return "You found the door to the boss room.";
+    } else {
+      return "You found a door.";
+    }
   }
 
-  handle_new_floor() {
-    this.change_floors();
+  handleNewFloor() {
+    this.changeFloors();
     return "You moved to the next floor.";
   }
 
-  get_encounter() {
-    if (this.encounter_count !== MAX_ENCOUNTER_COUNT) {
-      this.progress_encounters();
+  getEncounter() {
+    if (this.encounterCount !== MAX_ENCOUNTER_COUNT) {
+      this.progressEncounters();
       let roll = Math.floor(Math.random() * 5);
       switch (roll) {
         case 0:
-          return this.handle_chest();
+          return this.handleChest();
         case 1:
-          return this.handle_mob();
+          return this.handleMob();
         case 2:
-          return this.handle_corpse();
+          return this.handleCorpse();
         case 3:
-          return this.handle_nothing();
+          return this.handleNothing();
         case 4:
-          return this.handle_special();
+          return this.handleSpecial();
         default:
-          return this.handle_nothing();
+          return this.handleNothing();
       }
     } else {
-      if (this.room_count !== MAX_ROOM_COUNT) {
-        return this.handle_door();
-      } else {
-        return this.handle_new_floor();
-      }
+      return this.handleDoor();
     }
   }
 }
