@@ -4,9 +4,9 @@ const MAX_ROOM_COUNT = 5;
 
 class Floor {
   constructor() {
-    this.depth = 0;
+    this.depth = 1;
     this.encounter_count = 0;
-    this.room_count = 0;
+    this.room_count = 1;
   }
 
   set_depth(depth) {
