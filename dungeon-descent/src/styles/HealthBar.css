@@ -6,6 +6,7 @@
     position: relative;
     height: 20px;
     margin: 10px 0;
+    transition: transform 0.20s ease-in-out; 
   }
   
   .HealthBar-inner {
@@ -18,10 +19,23 @@
     white-space: nowrap;
     overflow: hidden;
     padding-left: 5px; 
+    transition: width 0.20s ease-in-out, padding-left 0.20s ease-in-out; 
   }
   
   .HealthBar-text {
     position: absolute;
     left: 5px; 
+  }
+  
+  @keyframes shake {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(-0.5deg); }
+    50% { transform: rotate(0.5deg); }
+    75% { transform: rotate(-0.5deg); }
+    100% { transform: rotate(0deg); }
+  }
+  
+  .shake {
+    animation: shake 0.20s;
   }
   
