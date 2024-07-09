@@ -43,7 +43,7 @@ class Floor {
   }
 
   handleMob() {
-    return "You encountered a Goliath Nightmare Horned World-ender.";
+    return "You encountered a Skeleton";
   }
 
   handleCorpse() {
