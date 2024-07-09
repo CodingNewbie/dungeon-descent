@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { createCharacter } from './Character';
 import { Floor } from './Floor'; 
 import { Stats, StatsDisplay, BonusStatsDisplay } from './Stats';
-import EncounterPopup from './EncounterPopup';  // Import the popup component
+import EncounterPopup from './EncounterPopup';  
 import '../styles/App.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
@@ -19,16 +19,16 @@ function Game() {
   const [currentFloor, setCurrentFloor] = useState(1);
   const [currentRoom, setCurrentRoom] = useState(1);
   const [isBossRoom, setIsBossRoom] = useState(false);
-  const [monsterEncounter, setMonsterEncounter] = useState(null);  // State to handle monster encounter
-  const [popupVisible, setPopupVisible] = useState(false);  // State to control popup visibility
+  const [monsterEncounter, setMonsterEncounter] = useState(null);  
+  const [popupVisible, setPopupVisible] = useState(false); 
+
+  const eventsEndRef = useRef(null);
+  const MAX_EVENTS = 50;
 
   const handleCreateCharacter = () => {
     const newCharacter = createCharacter('Bob');
     setCharacter(newCharacter);
   };
-
-  const eventsEndRef = useRef(null);
-  const MAX_EVENTS = 50;
 
   const handleChestOpen = () => {
     const roll = Math.random();
@@ -131,7 +131,7 @@ function Game() {
     if (eventsEndRef.current) {
       eventsEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [events, chestInteraction, doorInteraction]);
+  }, [events, chestInteraction, doorInteraction, monsterEncounter]);
 
   return (
     <div className="Game">
