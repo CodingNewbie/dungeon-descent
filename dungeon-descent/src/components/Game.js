@@ -1,15 +1,14 @@
-// src/components/Game.js
 import React, { useState, useEffect, useRef } from 'react';
 import { createCharacter } from './Character';
 import { Floor } from './Floor'; 
 import { Stats, StatsDisplay, BonusStatsDisplay } from './Stats';
-import EncounterPopup from './EncounterPopup';  
+import EncounterPopup from './EncounterPopup';
 import '../styles/App.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
 function Game() {
   const [events, setEvents] = useState([]);
-  const [character, setCharacter] = useState(createCharacter(''));
+  const [character, setCharacter] = useState(createCharacter('Bob'));
   const [floor] = useState(new Floor());
   const [stats] = useState(new Stats());
   const [lockedChest, setLockedChest] = useState(false);
@@ -19,10 +18,14 @@ function Game() {
   const [currentFloor, setCurrentFloor] = useState(1);
   const [currentRoom, setCurrentRoom] = useState(1);
   const [isBossRoom, setIsBossRoom] = useState(false);
-  const [monsterEncounter, setMonsterEncounter] = useState(null);  
-  const [popupVisible, setPopupVisible] = useState(false); 
+  const [monsterEncounter, setMonsterEncounter] = useState(null);
+  const [popupVisible, setPopupVisible] = useState(false);
+  const [combatLogs, setCombatLogs] = useState([]);
+  const [heroHealth, setHeroHealth] = useState(1000);
+  const [monsterHealth, setMonsterHealth] = useState(1000);
 
   const eventsEndRef = useRef(null);
+  const combatLogsEndRef = useRef(null);
   const MAX_EVENTS = 50;
 
   const handleCreateCharacter = () => {
@@ -84,12 +87,63 @@ function Game() {
   };
 
   const handleEngage = () => {
-    setPopupVisible(true);  // Show the popup
+    setCombatLogs([]); // Clear previous combat logs
+    setPopupVisible(true);
+    handleCombatPhase();
   };
 
   const handleFlee = () => {
     setEvents((prevEvents) => [...prevEvents, 'You fled from the skeleton.']);
     setMonsterEncounter(null);
+  };
+
+  const handleCombatPhase = () => {
+    setCombatLogs(['Combat begins!']);
+    let heroTurn = true;
+    let continueCombat = true;
+
+    const combatStep = () => {
+      if (!continueCombat) return; // Stop combat if flag is false
+
+      if (heroTurn) {
+        setMonsterHealth((prevHealth) => {
+          const newHealth = prevHealth - 200;
+          setCombatLogs((prevLogs) => [...prevLogs, `You dealt 200 damage to the Skeleton.`]);
+          if (newHealth <= 0) {
+            setCombatLogs((prevLogs) => [...prevLogs, `Skeleton dropped <i class="fa-solid fa-coins" style="color: #FFD43B;"></i> 100 gold.`]);
+            continueCombat = false;
+            return 0;
+          }
+          return newHealth;
+        });
+      } else {
+        setHeroHealth((prevHealth) => {
+          const newHealth = prevHealth - 100;
+          setCombatLogs((prevLogs) => [...prevLogs, `Skeleton dealt 100 damage to you.`]);
+          if (newHealth <= 0) {
+            setCombatLogs((prevLogs) => [...prevLogs, 'You have died.']);
+            continueCombat = false;
+            return 0;
+          }
+          return newHealth;
+        });
+      }
+      heroTurn = !heroTurn;
+
+      if (heroHealth > 0 && monsterHealth > 0 && continueCombat) {
+        setTimeout(combatStep, 1000);
+      }
+    };
+
+    combatStep();
+  };
+
+  const handleClaimReward = () => {
+    setEvents((prevEvents) => [...prevEvents, 'You claimed the reward.']);
+    setPopupVisible(false);
+    setMonsterEncounter(null);
+    setHeroHealth(1000); 
+    setMonsterHealth(1000);
   };
 
   useEffect(() => {
@@ -133,6 +187,12 @@ function Game() {
     }
   }, [events, chestInteraction, doorInteraction, monsterEncounter]);
 
+  useEffect(() => {
+    if (combatLogsEndRef.current) {
+      combatLogsEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [combatLogs, popupVisible]);
+
   return (
     <div className="Game">
       <header className="App-header">
@@ -153,21 +213,21 @@ function Game() {
           </div>
         ))}
         {chestInteraction && (
-          <div className="Chest-interaction">
+          <div className="interaction">
             <p>{chestInteraction}</p>
             <button onClick={handleChestOpen}>Open the chest</button>
             <button onClick={handleChestIgnore}>Ignore</button>
           </div>
         )}
         {doorInteraction && (
-          <div className="Door-interaction">
+          <div className="interaction">
             <p style={isBossRoom ? { color: 'red' } : {}}>{doorInteraction}</p>
             <button onClick={handleDoorOpen}>Enter</button>
             <button onClick={handleDoorIgnore}>Ignore</button>
           </div>
         )}
         {monsterEncounter && (
-          <div className="Monster-interaction">
+          <div className="interaction">
             <p>{monsterEncounter}</p>
             <button onClick={handleEngage}>Engage</button>
             <button onClick={handleFlee}>Flee</button>
@@ -175,7 +235,25 @@ function Game() {
         )}
         <div ref={eventsEndRef} />
       </div>
-      {popupVisible && <EncounterPopup onClose={() => setPopupVisible(false)} />}
+      {popupVisible && (
+        <EncounterPopup
+          monster={{
+            name: 'Skeleton',
+            level: 10,
+            currentHealth: monsterHealth,
+            totalHealth: 1000,
+            image: './images/monsters/skeleton-idle.gif',
+          }}
+          hero={{
+            name: 'Khor',
+            level: 10,
+            currentHealth: heroHealth,
+            totalHealth: 1000,
+          }}
+          combatLogs={combatLogs}
+          onClaimReward={handleClaimReward}
+        />
+      )}
     </div>
   );
 }

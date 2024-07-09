@@ -1,4 +1,3 @@
-// src/components/Floor.js
 const MAX_ENCOUNTER_COUNT = 6;
 const MAX_ROOM_COUNT = 5;
 

@@ -1,0 +1,49 @@
+.CombatEventContainer {
+    height: 300px;
+    overflow-y: auto;
+    border: 1px solid white;
+    border-radius: 5px;
+    padding: 10px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    background-color: black;
+    color: white;
+    text-align: left;
+  }
+  
+  .CombatEvent {
+    margin-bottom: 5px;
+  }
+  
+  .claim-reward {
+    margin-top: 10px;
+    text-align: left;
+  }
+  
+  .CombatEventContainer button {
+    background-color: black;
+    color: white;
+    border: 1px solid white;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+  
+  .CombatEventContainer::-webkit-scrollbar {
+    width: 30px;
+  }
+  
+  .CombatEventContainer::-webkit-scrollbar-track {
+    margin: 10px;
+    border-radius: 5px;
+  }
+  
+  .CombatEventContainer::-webkit-scrollbar-thumb {
+    background-color: white;
+    border-radius: 50px;
+    border: solid 10px black;
+  }
+  
+  .CombatEventContainer::-webkit-scrollbar-thumb:hover {
+    background-color: lightgrey;
+  }

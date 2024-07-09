@@ -1,4 +1,3 @@
-// src/components/Stats.js
 import React from 'react';
 
 class Stats {
@@ -11,7 +10,6 @@ class Stats {
     this.cRate = 0;
     this.cDmg = 0;
 
-    // Bonus stats
     this.bonusHp = 0;
     this.bonusAtk = 0;
     this.bonusDef = 0;
@@ -21,7 +19,6 @@ class Stats {
     this.bonusCDmg = 0;
   }
 
-  // Getter methods
   getHp() {
     return this.hp;
   }
@@ -78,7 +75,6 @@ class Stats {
     return this.bonusCDmg;
   }
 
-  // Setter methods
   setHp(value) {
     this.hp = value;
   }
