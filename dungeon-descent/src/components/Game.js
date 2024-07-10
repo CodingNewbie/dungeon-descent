@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createCharacter } from './Character';
-import { Floor } from './Floor'; 
+import { Floor } from './Floor';
 import { Stats, StatsDisplay, BonusStatsDisplay } from './Stats';
 import EncounterPopup from './EncounterPopup';
 import ChestInteraction from './interactions/ChestInteraction';
@@ -135,10 +135,10 @@ function Game() {
     setCombatLogs(['Combat begins!']);
     let heroTurn = true;
     let continueCombat = true;
-  
+
     const combatStep = () => {
       if (!continueCombat) return;
-  
+
       if (heroTurn) {
         setMonsterHealth((prevHealth) => {
           const newHealth = prevHealth - 200;
@@ -178,15 +178,15 @@ function Game() {
         });
       }
       heroTurn = !heroTurn;
-  
+
       if (heroHealth > 0 && monsterHealth > 0 && continueCombat) {
         setTimeout(combatStep, 1000);
       }
     };
-  
+
     setTimeout(combatStep, 1000);
   };
-  
+
   const handleClaimReward = () => {
     handleEvent(setEvents, 'You claimed the reward.', MAX_EVENTS);
     setPopupVisible(false);
@@ -196,7 +196,7 @@ function Game() {
     setMonsterStatus('alive');
     setMonsterAnimation('idle');
   };
-  
+
   useEffect(() => {
     if (!lockedChest && !foundDoor && !monsterEncounter) {
       const interval = setInterval(() => {
@@ -225,11 +225,11 @@ function Game() {
           handleEvent(setEvents, encounterMessage, MAX_EVENTS);
         }
       }, 500);
-  
+
       return () => clearInterval(interval);
     }
   }, [floor, lockedChest, foundDoor, monsterEncounter]);
-  
+
   return (
     <div className="Game">
       <header className="App-header">
@@ -259,25 +259,25 @@ function Game() {
           </div>
         ))}
         {chestInteraction && (
-          <ChestInteraction 
-            chestInteraction={chestInteraction} 
-            handleChestOpen={handleChestOpen} 
-            handleChestIgnore={handleChestIgnore} 
+          <ChestInteraction
+            chestInteraction={chestInteraction}
+            handleChestOpen={handleChestOpen}
+            handleChestIgnore={handleChestIgnore}
           />
         )}
         {doorInteraction && (
-          <DoorInteraction 
-            doorInteraction={doorInteraction} 
-            handleDoorOpen={handleDoorOpen} 
-            handleDoorIgnore={handleDoorIgnore} 
-            isBossRoom={isBossRoom} 
+          <DoorInteraction
+            doorInteraction={doorInteraction}
+            handleDoorOpen={handleDoorOpen}
+            handleDoorIgnore={handleDoorIgnore}
+            isBossRoom={isBossRoom}
           />
         )}
         {monsterEncounter && (
-          <MonsterInteraction 
-            monsterEncounter={monsterEncounter} 
-            handleEngage={handleEngage} 
-            handleFlee={handleFlee} 
+          <MonsterInteraction
+            monsterEncounter={monsterEncounter}
+            handleEngage={handleEngage}
+            handleFlee={handleFlee}
           />
         )}
         <div ref={eventsEndRef} />
@@ -309,6 +309,6 @@ function Game() {
       )}
     </div>
   );
-  }
-  
-  export default Game;
+}
+
+export default Game;
