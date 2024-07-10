@@ -3,10 +3,11 @@ import { createCharacter } from './Character';
 import { Floor } from './Floor';
 import { Stats, StatsDisplay, BonusStatsDisplay } from './Stats';
 import EncounterPopup from './EncounterPopup';
+import HeroStatus from './HeroStatus';
 import ChestInteraction from './interactions/ChestInteraction';
 import DoorInteraction from './interactions/DoorInteraction';
 import MonsterInteraction from './interactions/MonsterInteraction';
-import HeroStatus from './HeroStatus';
+import Inventory from './Inventory';
 import { handleEvent } from '../utils/gameUtils';
 import { selectMonster } from '../utils/SelectMonsters';
 import { MAX_EVENTS, INITIAL_HERO_HEALTH, INITIAL_MONSTER_HEALTH } from '../constants';
@@ -43,6 +44,9 @@ function Game() {
   const [requiredXP, setRequiredXP] = useState(100);
   const [heroLevel, setHeroLevel] = useState(1);
   const [gold, setGold] = useState(0);
+  const [inventory, setInventory] = useState(['Sword', 'Axe', 'Shield', 'Helmet']);
+  const [showInventory, setShowInventory] = useState(false);
+
 
   const eventsEndRef = useRef(null);
   const combatLogsEndRef = useRef(null);
@@ -225,11 +229,11 @@ function Game() {
           handleEvent(setEvents, encounterMessage, MAX_EVENTS);
         }
       }, 500);
-
+  
       return () => clearInterval(interval);
     }
   }, [floor, lockedChest, foundDoor, monsterEncounter]);
-
+  
   return (
     <div className="Game">
       <header className="App-header">
@@ -242,6 +246,8 @@ function Game() {
           currentXP={heroXP}
           requiredXP={requiredXP}
           gold={gold}
+          inventory={inventory}
+          setShowInventory={setShowInventory}
         />
       </div>
       <div className="Stats-container-wrapper">
@@ -307,8 +313,15 @@ function Game() {
           isMonsterHit={isMonsterHit}
         />
       )}
+      {showInventory && (
+        <Inventory
+          items={inventory}
+          onClose={() => setShowInventory(false)}
+        />
+      )}
     </div>
   );
-}
-
-export default Game;
+  }
+  
+  export default Game;
+  
