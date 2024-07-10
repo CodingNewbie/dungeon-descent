@@ -8,6 +8,7 @@ import DoorInteraction from './interactions/DoorInteraction';
 import MonsterInteraction from './interactions/MonsterInteraction';
 import HeroStatus from './HeroStatus';
 import { handleEvent } from '../utils/gameUtils';
+import { selectMonster } from '../utils/SelectMonsters';
 import { MAX_EVENTS, INITIAL_HERO_HEALTH, INITIAL_MONSTER_HEALTH } from '../constants';
 import '../styles/App.css';
 import '../styles/EventsContainer.css';
@@ -17,7 +18,7 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 
 function Game() {
   const [events, setEvents] = useState([]);
-  const [character, setCharacter] = useState(createCharacter('Bob'));
+  const [character, setCharacter] = useState(createCharacter('Khor'));
   const [floor] = useState(new Floor());
   const [stats] = useState(new Stats());
   const [lockedChest, setLockedChest] = useState(false);
@@ -34,12 +35,14 @@ function Game() {
   const [monsterHealth, setMonsterHealth] = useState(INITIAL_MONSTER_HEALTH);
   const [monsterStatus, setMonsterStatus] = useState('alive');
   const [monsterType, setMonsterType] = useState('skeleton');
+  const [monsterXP, setMonsterXP] = useState(0);
+  const [monsterGold, setMonsterGold] = useState(0);
   const [monsterAnimation, setMonsterAnimation] = useState('idle');
   const [isMonsterHit, setIsMonsterHit] = useState(false);
-  const [heroXP, setHeroXP] = useState(0);  // Add this state for hero's current XP
-  const [requiredXP, setRequiredXP] = useState(100);  // Add this state for required XP to next level
-  const [heroLevel, setHeroLevel] = useState(1);  // Add this state for hero's level
-  const [gold, setGold] = useState(0);  // Add this state for hero's current gold
+  const [heroXP, setHeroXP] = useState(0);
+  const [requiredXP, setRequiredXP] = useState(100);
+  const [heroLevel, setHeroLevel] = useState(1);
+  const [gold, setGold] = useState(0);
 
   const eventsEndRef = useRef(null);
   const combatLogsEndRef = useRef(null);
@@ -64,9 +67,12 @@ function Game() {
   const handleChestOpen = () => {
     const roll = Math.random();
     if (roll < 0.3) {
-      setMonsterType('mimic');
+      const selectedMonster = selectMonster();
+      setMonsterType(selectedMonster.type);
       setMonsterHealth(INITIAL_MONSTER_HEALTH);
       setMonsterStatus('alive');
+      setMonsterXP(selectedMonster.xp);
+      setMonsterGold(selectedMonster.gold);
       setMonsterAnimation('idle');
       setCombatLogs([]);
       setPopupVisible(true);
@@ -74,7 +80,7 @@ function Game() {
     } else {
       const result = roll < 0.5 ? 'The chest is empty.' : 'You found 100 gold.';
       if (roll >= 0.5) {
-        setGold(prevGold => prevGold + 100);  // Add gold when a chest is found
+        setGold(prevGold => prevGold + 100);
       }
       handleEvent(setEvents, result, MAX_EVENTS);
       setLockedChest(false);
@@ -129,10 +135,10 @@ function Game() {
     setCombatLogs(['Combat begins!']);
     let heroTurn = true;
     let continueCombat = true;
-
+  
     const combatStep = () => {
       if (!continueCombat) return;
-
+  
       if (heroTurn) {
         setMonsterHealth((prevHealth) => {
           const newHealth = prevHealth - 200;
@@ -140,15 +146,18 @@ function Game() {
           setTimeout(() => setIsMonsterHit(false), 200);
           setCombatLogs((prevLogs) => [...prevLogs, `You dealt 200 damage to the ${monsterType}.`]);
           if (newHealth <= 0) {
-            setCombatLogs((prevLogs) => [...prevLogs, `${monsterType} dropped 100 gold.`]);
+            setCombatLogs((prevLogs) => [...prevLogs, `${monsterType} dropped ${monsterGold} gold.`]);
             setMonsterStatus('dead');
-            setGold(prevGold => prevGold + 100);  // Add gold when a monster is defeated
-            setHeroXP(prevXP => prevXP + 50);  // Add XP when a monster is defeated
-            if (heroXP + 50 >= requiredXP) {  // Check if XP exceeds required XP
-              setHeroLevel(prevLevel => prevLevel + 1);  // Level up the hero
-              setHeroXP(0);  // Reset XP
-              setRequiredXP(prevXP => prevXP + 100);  // Increase required XP for next level
-            }
+            setGold(prevGold => prevGold + monsterGold);
+            setHeroXP(prevXP => {
+              const newXP = prevXP + monsterXP;
+              if (newXP >= requiredXP) {
+                setHeroLevel(prevLevel => prevLevel + 1);
+                setRequiredXP(prevXP => prevXP + 100);
+                return newXP - requiredXP;
+              }
+              return newXP;
+            });
             continueCombat = false;
             return 0;
           }
@@ -169,15 +178,15 @@ function Game() {
         });
       }
       heroTurn = !heroTurn;
-
+  
       if (heroHealth > 0 && monsterHealth > 0 && continueCombat) {
         setTimeout(combatStep, 1000);
       }
     };
-
+  
     setTimeout(combatStep, 1000);
   };
-
+  
   const handleClaimReward = () => {
     handleEvent(setEvents, 'You claimed the reward.', MAX_EVENTS);
     setPopupVisible(false);
@@ -187,7 +196,7 @@ function Game() {
     setMonsterStatus('alive');
     setMonsterAnimation('idle');
   };
-
+  
   useEffect(() => {
     if (!lockedChest && !foundDoor && !monsterEncounter) {
       const interval = setInterval(() => {
@@ -203,9 +212,11 @@ function Game() {
           setDoorInteraction(encounterMessage);
           setIsBossRoom(true);
         } else if (encounterMessage.startsWith('You encountered a')) {
-          const monster = encounterMessage.split(' ').pop().toLowerCase();
-          setMonsterType(monster);
-          setMonsterEncounter(encounterMessage);
+          const monster = selectMonster();
+          setMonsterType(monster.type);
+          setMonsterXP(monster.xp);
+          setMonsterGold(monster.gold);
+          setMonsterEncounter(`You encountered a ${monster.type}`);
         } else {
           if (encounterMessage === 'You moved to the next floor.') {
             setCurrentFloor(floor.depth);
@@ -214,11 +225,11 @@ function Game() {
           handleEvent(setEvents, encounterMessage, MAX_EVENTS);
         }
       }, 500);
-
+  
       return () => clearInterval(interval);
     }
   }, [floor, lockedChest, foundDoor, monsterEncounter]);
-
+  
   return (
     <div className="Game">
       <header className="App-header">
@@ -298,6 +309,6 @@ function Game() {
       )}
     </div>
   );
-}
-
-export default Game;
+  }
+  
+  export default Game;

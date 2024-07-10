@@ -7,9 +7,9 @@ export const selectMonster = () => {
   for (const monster of monsters) {
     cumulativeProbability += monster.probability;
     if (random < cumulativeProbability) {
-      return monster.type;
+      return monster;
     }
   }
 
-  return monsters[monsters.length - 1].type; // Default to the last monster if something goes wrong
+  return monsters[monsters.length - 1]; // Default to the last monster if something goes wrong
 };

@@ -7,10 +7,14 @@ const HeroStatus = ({ name, level, currentXP, requiredXP, gold }) => {
 
   return (
     <div className="HeroStatus">
-      <p><strong>Name:</strong> {name}</p>
-      <p><strong>Level:</strong> {level}</p>
-      <p><strong>Experience:</strong> {currentXP}/{requiredXP} ({xpPercentage.toFixed(2)}%)</p>
-      <p><strong>Gold:</strong> {gold}</p>
+      <p><i className="fa-solid fa-user" style={{ color: '#ffffff' }}></i> {name} Lv. {level}</p>
+      <p></p>
+      <div>
+        <p>Exp</p>
+        <p>{currentXP}/{requiredXP} ({xpPercentage.toFixed(2)}%)</p>
+      </div>
+      
+      <p><i className="fa-solid fa-coins" style={{ color: '#FFD43B' }}></i> {gold}</p>
     </div>
   );
 };
