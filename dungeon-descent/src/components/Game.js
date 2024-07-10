@@ -3,6 +3,11 @@ import { createCharacter } from './Character';
 import { Floor } from './Floor'; 
 import { Stats, StatsDisplay, BonusStatsDisplay } from './Stats';
 import EncounterPopup from './EncounterPopup';
+import ChestInteraction from './interactions/ChestInteraction';
+import DoorInteraction from './interactions/DoorInteraction';
+import MonsterInteraction from './interactions/MonsterInteraction';
+import { handleEvent } from '../utils/gameUtils';
+import { MAX_EVENTS, INITIAL_HERO_HEALTH, INITIAL_MONSTER_HEALTH } from '../constants';
 import '../styles/App.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
@@ -21,16 +26,27 @@ function Game() {
   const [monsterEncounter, setMonsterEncounter] = useState(null);
   const [popupVisible, setPopupVisible] = useState(false);
   const [combatLogs, setCombatLogs] = useState([]);
-  const [heroHealth, setHeroHealth] = useState(1000);
-  const [monsterHealth, setMonsterHealth] = useState(1000);
-  const [monsterStatus, setMonsterStatus] = useState('alive'); 
-  const [monsterType, setMonsterType] = useState('skeleton'); 
-  const [monsterAnimation, setMonsterAnimation] = useState('idle'); 
-  const [isMonsterHit, setIsMonsterHit] = useState(false); 
+  const [heroHealth, setHeroHealth] = useState(INITIAL_HERO_HEALTH);
+  const [monsterHealth, setMonsterHealth] = useState(INITIAL_MONSTER_HEALTH);
+  const [monsterStatus, setMonsterStatus] = useState('alive');
+  const [monsterType, setMonsterType] = useState('skeleton');
+  const [monsterAnimation, setMonsterAnimation] = useState('idle');
+  const [isMonsterHit, setIsMonsterHit] = useState(false);
 
   const eventsEndRef = useRef(null);
   const combatLogsEndRef = useRef(null);
-  const MAX_EVENTS = 50;
+
+  useEffect(() => {
+    if (eventsEndRef.current) {
+      eventsEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [events, chestInteraction, doorInteraction, monsterEncounter]);
+
+  useEffect(() => {
+    if (combatLogsEndRef.current) {
+      combatLogsEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [combatLogs, popupVisible]);
 
   const handleCreateCharacter = () => {
     const newCharacter = createCharacter('Bob');
@@ -39,30 +55,24 @@ function Game() {
 
   const handleChestOpen = () => {
     const roll = Math.random();
-    if (roll < 0.3) { 
+    if (roll < 0.3) {
       setMonsterType('mimic');
-      setMonsterHealth(1000); 
-      setMonsterStatus('alive'); 
-      setMonsterAnimation('idle'); 
+      setMonsterHealth(INITIAL_MONSTER_HEALTH);
+      setMonsterStatus('alive');
+      setMonsterAnimation('idle');
       setCombatLogs([]);
       setPopupVisible(true);
       handleCombatPhase();
     } else {
-      const result = roll < 0.5 ? (
-        'The chest is empty.'
-      ) : (
-        <>
-          You found <i className="fa-solid fa-coins" style={{ color: '#FFD43B' }}></i> 100 gold.
-        </>
-      );
-      setEvents((prevEvents) => [...prevEvents, result]);
+      const result = roll < 0.5 ? 'The chest is empty.' : 'You found 100 gold.';
+      handleEvent(setEvents, result, MAX_EVENTS);
       setLockedChest(false);
       setChestInteraction(null);
     }
   };
 
   const handleChestIgnore = () => {
-    setEvents((prevEvents) => [...prevEvents, 'You ignored the chest.']);
+    handleEvent(setEvents, 'You ignored the chest.', MAX_EVENTS);
     setLockedChest(false);
     setChestInteraction(null);
   };
@@ -73,44 +83,34 @@ function Game() {
       setCurrentFloor(floor.depth);
       setCurrentRoom(1);
       setIsBossRoom(false);
-      setEvents((prevEvents) => [
-        ...prevEvents,
-        'You entered the boss room and moved to the next floor.'
-      ]);
+      handleEvent(setEvents, 'You entered the boss room and moved to the next floor.', MAX_EVENTS);
     } else {
       floor.changeRooms();
-      console.log(`Current room after changeRooms: ${floor.roomCount}`);
       setCurrentRoom(floor.roomCount);
-      setEvents((prevEvents) => [
-        ...prevEvents,
-        'You opened the door and entered a new room.'
-      ]);
+      handleEvent(setEvents, 'You opened the door and entered a new room.', MAX_EVENTS);
     }
     setFoundDoor(false);
     setDoorInteraction(null);
   };
 
   const handleDoorIgnore = () => {
-    setEvents((prevEvents) => [
-      ...prevEvents,
-      'You ignored it and decided to move on.'
-    ]);
+    handleEvent(setEvents, 'You ignored it and decided to move on.', MAX_EVENTS);
     floor.encounterCount = 0;
     setFoundDoor(false);
     setDoorInteraction(null);
   };
 
   const handleEngage = () => {
-    setMonsterHealth(1000); 
-    setMonsterStatus('alive'); 
-    setMonsterAnimation('idle'); 
-    setCombatLogs([]); 
+    setMonsterHealth(INITIAL_MONSTER_HEALTH);
+    setMonsterStatus('alive');
+    setMonsterAnimation('idle');
+    setCombatLogs([]);
     setPopupVisible(true);
     handleCombatPhase();
   };
 
   const handleFlee = () => {
-    setEvents((prevEvents) => [...prevEvents, `You fled from the ${monsterType}.`]);
+    handleEvent(setEvents, `You fled from the ${monsterType}.`, MAX_EVENTS);
     setMonsterEncounter(null);
   };
 
@@ -120,17 +120,17 @@ function Game() {
     let continueCombat = true;
 
     const combatStep = () => {
-      if (!continueCombat) return; 
+      if (!continueCombat) return;
 
       if (heroTurn) {
         setMonsterHealth((prevHealth) => {
           const newHealth = prevHealth - 200;
-          setIsMonsterHit(true); 
-          setTimeout(() => setIsMonsterHit(false), 200); 
+          setIsMonsterHit(true);
+          setTimeout(() => setIsMonsterHit(false), 200);
           setCombatLogs((prevLogs) => [...prevLogs, `You dealt 200 damage to the ${monsterType}.`]);
           if (newHealth <= 0) {
-            setCombatLogs((prevLogs) => [...prevLogs, `${monsterType} dropped <i class="fa-solid fa-coins" style="color: #FFD43B;"></i> 100 gold.`]);
-            setMonsterStatus('dead'); 
+            setCombatLogs((prevLogs) => [...prevLogs, `${monsterType} dropped 100 gold.`]);
+            setMonsterStatus('dead');
             continueCombat = false;
             return 0;
           }
@@ -138,7 +138,7 @@ function Game() {
         });
       } else {
         setHeroHealth((prevHealth) => {
-          setMonsterAnimation('attack'); 
+          setMonsterAnimation('attack');
           const newHealth = prevHealth - 100;
           setCombatLogs((prevLogs) => [...prevLogs, `${monsterType} dealt 100 damage to you.`]);
           if (newHealth <= 0) {
@@ -157,18 +157,17 @@ function Game() {
       }
     };
 
-    
     setTimeout(combatStep, 1000);
   };
 
   const handleClaimReward = () => {
-    setEvents((prevEvents) => [...prevEvents, 'You claimed the reward.']);
+    handleEvent(setEvents, 'You claimed the reward.', MAX_EVENTS);
     setPopupVisible(false);
     setMonsterEncounter(null);
-    setHeroHealth(1000); 
-    setMonsterHealth(1000);
-    setMonsterStatus('alive'); 
-    setMonsterAnimation('idle'); 
+    setHeroHealth(INITIAL_HERO_HEALTH);
+    setMonsterHealth(INITIAL_MONSTER_HEALTH);
+    setMonsterStatus('alive');
+    setMonsterAnimation('idle');
   };
 
   useEffect(() => {
@@ -194,31 +193,13 @@ function Game() {
             setCurrentFloor(floor.depth);
             setCurrentRoom(floor.roomCount);
           }
-          setEvents((prevEvents) => {
-            const updatedEvents = [...prevEvents, encounterMessage];
-            if (updatedEvents.length > MAX_EVENTS) {
-              updatedEvents.shift();
-            }
-            return updatedEvents;
-          });
+          handleEvent(setEvents, encounterMessage, MAX_EVENTS);
         }
       }, 500);
 
       return () => clearInterval(interval);
     }
   }, [floor, lockedChest, foundDoor, monsterEncounter]);
-
-  useEffect(() => {
-    if (eventsEndRef.current) {
-      eventsEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [events, chestInteraction, doorInteraction, monsterEncounter]);
-
-  useEffect(() => {
-    if (combatLogsEndRef.current) {
-      combatLogsEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [combatLogs, popupVisible]);
 
   return (
     <div className="Game">
@@ -240,25 +221,26 @@ function Game() {
           </div>
         ))}
         {chestInteraction && (
-          <div className="interaction">
-            <p>{chestInteraction}</p>
-            <button onClick={handleChestOpen}>Open the chest</button>
-            <button onClick={handleChestIgnore}>Ignore</button>
-          </div>
+          <ChestInteraction 
+            chestInteraction={chestInteraction} 
+            handleChestOpen={handleChestOpen} 
+            handleChestIgnore={handleChestIgnore} 
+          />
         )}
         {doorInteraction && (
-          <div className="interaction">
-            <p style={isBossRoom ? { color: 'red' } : {}}>{doorInteraction}</p>
-            <button onClick={handleDoorOpen}>Enter</button>
-            <button onClick={handleDoorIgnore}>Ignore</button>
-          </div>
+          <DoorInteraction 
+            doorInteraction={doorInteraction} 
+            handleDoorOpen={handleDoorOpen} 
+            handleDoorIgnore={handleDoorIgnore} 
+            isBossRoom={isBossRoom} 
+          />
         )}
         {monsterEncounter && (
-          <div className="interaction">
-            <p>{monsterEncounter}</p>
-            <button onClick={handleEngage}>Engage</button>
-            <button onClick={handleFlee}>Flee</button>
-          </div>
+          <MonsterInteraction 
+            monsterEncounter={monsterEncounter} 
+            handleEngage={handleEngage} 
+            handleFlee={handleFlee} 
+          />
         )}
         <div ref={eventsEndRef} />
       </div>
@@ -268,7 +250,7 @@ function Game() {
             name: monsterType.charAt(0).toUpperCase() + monsterType.slice(1),
             level: 10,
             currentHealth: monsterHealth,
-            totalHealth: 1000,
+            totalHealth: INITIAL_MONSTER_HEALTH,
             type: monsterType,
             status: monsterStatus
           }}
@@ -276,7 +258,7 @@ function Game() {
             name: 'Khor',
             level: 10,
             currentHealth: heroHealth,
-            totalHealth: 1000,
+            totalHealth: INITIAL_HERO_HEALTH,
           }}
           combatLogs={combatLogs}
           onClaimReward={handleClaimReward}
@@ -284,7 +266,7 @@ function Game() {
           monsterStatus={monsterStatus}
           monsterType={monsterType}
           monsterAnimation={monsterAnimation}
-          isMonsterHit={isMonsterHit} 
+          isMonsterHit={isMonsterHit}
         />
       )}
     </div>
