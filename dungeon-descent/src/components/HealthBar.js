@@ -13,7 +13,7 @@ function HealthBar({ current, total }) {
       setIsShaking(true);
       const timer = setTimeout(() => {
         setIsShaking(false);
-      }, 500); // Duration of the shake animation
+      }, 500); 
       return () => clearTimeout(timer);
     }
   }, [current, total]);

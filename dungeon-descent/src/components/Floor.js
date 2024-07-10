@@ -1,3 +1,6 @@
+// src/components/Floor.js
+import { selectMonster } from '../utils/SelectMonsters';
+
 const MAX_ENCOUNTER_COUNT = 6;
 const MAX_ROOM_COUNT = 5;
 
@@ -42,7 +45,7 @@ class Floor {
   }
 
   handleMob() {
-    return "You encountered a Skeleton";
+    return `You encountered a ${selectMonster()}`;
   }
 
   handleCorpse() {

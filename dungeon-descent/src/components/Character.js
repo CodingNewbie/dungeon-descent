@@ -10,7 +10,6 @@ class Character {
   function createCharacter(name) {
     const character = new Character();
     character.set_name(name);
-    console.log("Created a new character with name: " + name);
     return character;
   }
   

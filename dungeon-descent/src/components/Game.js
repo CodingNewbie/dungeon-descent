@@ -23,6 +23,10 @@ function Game() {
   const [combatLogs, setCombatLogs] = useState([]);
   const [heroHealth, setHeroHealth] = useState(1000);
   const [monsterHealth, setMonsterHealth] = useState(1000);
+  const [monsterStatus, setMonsterStatus] = useState('alive'); 
+  const [monsterType, setMonsterType] = useState('skeleton'); 
+  const [monsterAnimation, setMonsterAnimation] = useState('idle'); 
+  const [isMonsterHit, setIsMonsterHit] = useState(false); 
 
   const eventsEndRef = useRef(null);
   const combatLogsEndRef = useRef(null);
@@ -35,16 +39,26 @@ function Game() {
 
   const handleChestOpen = () => {
     const roll = Math.random();
-    const result = roll < 0.5 ? (
-      'The chest is empty.'
-    ) : (
-      <>
-        You found <i className="fa-solid fa-coins" style={{ color: '#FFD43B' }}></i> 100 gold.
-      </>
-    );
-    setEvents((prevEvents) => [...prevEvents, result]);
-    setLockedChest(false);
-    setChestInteraction(null);
+    if (roll < 0.3) { 
+      setMonsterType('mimic');
+      setMonsterHealth(1000); 
+      setMonsterStatus('alive'); 
+      setMonsterAnimation('idle'); 
+      setCombatLogs([]);
+      setPopupVisible(true);
+      handleCombatPhase();
+    } else {
+      const result = roll < 0.5 ? (
+        'The chest is empty.'
+      ) : (
+        <>
+          You found <i className="fa-solid fa-coins" style={{ color: '#FFD43B' }}></i> 100 gold.
+        </>
+      );
+      setEvents((prevEvents) => [...prevEvents, result]);
+      setLockedChest(false);
+      setChestInteraction(null);
+    }
   };
 
   const handleChestIgnore = () => {
@@ -87,13 +101,16 @@ function Game() {
   };
 
   const handleEngage = () => {
-    setCombatLogs([]); // Clear previous combat logs
+    setMonsterHealth(1000); 
+    setMonsterStatus('alive'); 
+    setMonsterAnimation('idle'); 
+    setCombatLogs([]); 
     setPopupVisible(true);
     handleCombatPhase();
   };
 
   const handleFlee = () => {
-    setEvents((prevEvents) => [...prevEvents, 'You fled from the skeleton.']);
+    setEvents((prevEvents) => [...prevEvents, `You fled from the ${monsterType}.`]);
     setMonsterEncounter(null);
   };
 
@@ -103,14 +120,17 @@ function Game() {
     let continueCombat = true;
 
     const combatStep = () => {
-      if (!continueCombat) return; // Stop combat if flag is false
+      if (!continueCombat) return; 
 
       if (heroTurn) {
         setMonsterHealth((prevHealth) => {
           const newHealth = prevHealth - 200;
-          setCombatLogs((prevLogs) => [...prevLogs, `You dealt 200 damage to the Skeleton.`]);
+          setIsMonsterHit(true); 
+          setTimeout(() => setIsMonsterHit(false), 200); 
+          setCombatLogs((prevLogs) => [...prevLogs, `You dealt 200 damage to the ${monsterType}.`]);
           if (newHealth <= 0) {
-            setCombatLogs((prevLogs) => [...prevLogs, `Skeleton dropped <i class="fa-solid fa-coins" style="color: #FFD43B;"></i> 100 gold.`]);
+            setCombatLogs((prevLogs) => [...prevLogs, `${monsterType} dropped <i class="fa-solid fa-coins" style="color: #FFD43B;"></i> 100 gold.`]);
+            setMonsterStatus('dead'); 
             continueCombat = false;
             return 0;
           }
@@ -118,13 +138,15 @@ function Game() {
         });
       } else {
         setHeroHealth((prevHealth) => {
+          setMonsterAnimation('attack'); 
           const newHealth = prevHealth - 100;
-          setCombatLogs((prevLogs) => [...prevLogs, `Skeleton dealt 100 damage to you.`]);
+          setCombatLogs((prevLogs) => [...prevLogs, `${monsterType} dealt 100 damage to you.`]);
           if (newHealth <= 0) {
             setCombatLogs((prevLogs) => [...prevLogs, 'You have died.']);
             continueCombat = false;
             return 0;
           }
+          setTimeout(() => setMonsterAnimation('idle'), 500);
           return newHealth;
         });
       }
@@ -135,7 +157,8 @@ function Game() {
       }
     };
 
-    combatStep();
+    
+    setTimeout(combatStep, 1000);
   };
 
   const handleClaimReward = () => {
@@ -144,6 +167,8 @@ function Game() {
     setMonsterEncounter(null);
     setHeroHealth(1000); 
     setMonsterHealth(1000);
+    setMonsterStatus('alive'); 
+    setMonsterAnimation('idle'); 
   };
 
   useEffect(() => {
@@ -160,7 +185,9 @@ function Game() {
           setFoundDoor(true);
           setDoorInteraction(encounterMessage);
           setIsBossRoom(true);
-        } else if (encounterMessage === 'You encountered a Skeleton') {
+        } else if (encounterMessage.startsWith('You encountered a')) {
+          const monster = encounterMessage.split(' ').pop().toLowerCase();
+          setMonsterType(monster);
           setMonsterEncounter(encounterMessage);
         } else {
           if (encounterMessage === 'You moved to the next floor.') {
@@ -238,11 +265,12 @@ function Game() {
       {popupVisible && (
         <EncounterPopup
           monster={{
-            name: 'Skeleton',
+            name: monsterType.charAt(0).toUpperCase() + monsterType.slice(1),
             level: 10,
             currentHealth: monsterHealth,
             totalHealth: 1000,
-            image: './images/monsters/skeleton-idle.gif',
+            type: monsterType,
+            status: monsterStatus
           }}
           hero={{
             name: 'Khor',
@@ -252,6 +280,11 @@ function Game() {
           }}
           combatLogs={combatLogs}
           onClaimReward={handleClaimReward}
+          monsterHealth={monsterHealth}
+          monsterStatus={monsterStatus}
+          monsterType={monsterType}
+          monsterAnimation={monsterAnimation}
+          isMonsterHit={isMonsterHit} 
         />
       )}
     </div>
