@@ -1,0 +1,31 @@
+.Stats-container-wrapper {
+    display: flex;
+    gap: 10px;
+    justify-content: center; 
+    margin: 20px auto; 
+  }
+  
+  .Stats-container {
+    height: auto;
+    width: 220px;
+    padding: 10px;
+    border: 1px solid white;
+    border-radius: 10px;
+    background-color: black;
+    color: white;
+    text-align: left;
+    line-height: 1.25;
+  }
+  
+  .BonusStats-container {
+    height: auto;
+    width: 220px;
+    padding: 10px;
+    border: 1px solid white;
+    border-radius: 10px;
+    background-color: black;
+    color: white;
+    text-align: left;
+    line-height: 1.25;
+  }
+  

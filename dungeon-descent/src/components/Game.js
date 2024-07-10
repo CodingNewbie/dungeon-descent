@@ -6,9 +6,13 @@ import EncounterPopup from './EncounterPopup';
 import ChestInteraction from './interactions/ChestInteraction';
 import DoorInteraction from './interactions/DoorInteraction';
 import MonsterInteraction from './interactions/MonsterInteraction';
+import HeroStatus from './HeroStatus';
 import { handleEvent } from '../utils/gameUtils';
 import { MAX_EVENTS, INITIAL_HERO_HEALTH, INITIAL_MONSTER_HEALTH } from '../constants';
 import '../styles/App.css';
+import '../styles/EventsContainer.css';
+import '../styles/InfoContainer.css';
+import '../styles/StatsContainer.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
 function Game() {
@@ -32,6 +36,10 @@ function Game() {
   const [monsterType, setMonsterType] = useState('skeleton');
   const [monsterAnimation, setMonsterAnimation] = useState('idle');
   const [isMonsterHit, setIsMonsterHit] = useState(false);
+  const [heroXP, setHeroXP] = useState(0);  // Add this state for hero's current XP
+  const [requiredXP, setRequiredXP] = useState(100);  // Add this state for required XP to next level
+  const [heroLevel, setHeroLevel] = useState(1);  // Add this state for hero's level
+  const [gold, setGold] = useState(0);  // Add this state for hero's current gold
 
   const eventsEndRef = useRef(null);
   const combatLogsEndRef = useRef(null);
@@ -65,6 +73,9 @@ function Game() {
       handleCombatPhase();
     } else {
       const result = roll < 0.5 ? 'The chest is empty.' : 'You found 100 gold.';
+      if (roll >= 0.5) {
+        setGold(prevGold => prevGold + 100);  // Add gold when a chest is found
+      }
       handleEvent(setEvents, result, MAX_EVENTS);
       setLockedChest(false);
       setChestInteraction(null);
@@ -131,6 +142,13 @@ function Game() {
           if (newHealth <= 0) {
             setCombatLogs((prevLogs) => [...prevLogs, `${monsterType} dropped 100 gold.`]);
             setMonsterStatus('dead');
+            setGold(prevGold => prevGold + 100);  // Add gold when a monster is defeated
+            setHeroXP(prevXP => prevXP + 50);  // Add XP when a monster is defeated
+            if (heroXP + 50 >= requiredXP) {  // Check if XP exceeds required XP
+              setHeroLevel(prevLevel => prevLevel + 1);  // Level up the hero
+              setHeroXP(0);  // Reset XP
+              setRequiredXP(prevXP => prevXP + 100);  // Increase required XP for next level
+            }
             continueCombat = false;
             return 0;
           }
@@ -206,6 +224,15 @@ function Game() {
       <header className="App-header">
         <h1>Dungeon Descent</h1>
       </header>
+      <div className="Hero-status-container">
+        <HeroStatus
+          name={character.name}
+          level={heroLevel}
+          currentXP={heroXP}
+          requiredXP={requiredXP}
+          gold={gold}
+        />
+      </div>
       <div className="Stats-container-wrapper">
         <StatsDisplay stats={stats} />
         <BonusStatsDisplay stats={stats} />

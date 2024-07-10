@@ -1,0 +1,10 @@
+.Info-container {
+    display: flex;
+    gap: 50px;
+    justify-content: center; 
+  }
+  
+  .Info-container p {
+    color: white;
+  }
+  
