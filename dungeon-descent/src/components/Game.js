@@ -61,6 +61,7 @@ function Game() {
     { item: 'Helmet', rarity: 'Common' }
   ]);
   const [showInventory, setShowInventory] = useState(false);
+  const [droppedLoot, setDroppedLoot] = useState([]);
 
   const eventsEndRef = useRef(null);
   const combatLogsEndRef = useRef(null);
@@ -153,10 +154,10 @@ function Game() {
     setCombatLogs(['Combat begins!']);
     let heroTurn = true;
     let continueCombat = true;
-  
+
     const combatStep = () => {
       if (!continueCombat) return;
-  
+
       if (heroTurn) {
         setMonsterHealth((prevHealth) => {
           const newHealth = prevHealth - 200;
@@ -176,17 +177,17 @@ function Game() {
               }
               return newXP;
             });
-  
+
             const currentMonster = monsters.find(monster => monster.type === monsterType);
-            const droppedLoot = selectLoot(currentMonster.lootTable);
-            if (droppedLoot.length > 0) {
+            const loot = selectLoot(currentMonster.lootTable);
+            setDroppedLoot(loot); // Store the dropped loot
+            if (loot.length > 0) {
               setCombatLogs((prevLogs) => [
                 ...prevLogs,
-                `You found: <span style="color: ${rarityColors[droppedLoot[0].rarity]}">${droppedLoot[0].item}</span>.`
+                `You found: <span style="color: ${rarityColors[loot[0].rarity]}">${loot[0].item}</span>.`
               ]);
-              setInventory(prevInventory => [...prevInventory, ...droppedLoot]);
             }
-  
+
             continueCombat = false;
             return 0;
           }
@@ -207,27 +208,27 @@ function Game() {
         });
       }
       heroTurn = !heroTurn;
-  
+
       if (heroHealth > 0 && monsterHealth > 0 && continueCombat) {
         setTimeout(combatStep, 1000);
       }
     };
-  
+
     setTimeout(combatStep, 1000);
   };
-  
 
   const handleClaimReward = () => {
-    const currentMonster = monsters.find(monster => monster.type === monsterType);
-    const droppedLoot = selectLoot(currentMonster.lootTable);
-    
     if (droppedLoot.length > 0) {
       setInventory((prevInventory) => [...prevInventory, ...droppedLoot]);
-      handleEvent(setEvents, `You claimed the reward. You found: <span style="color: ${rarityColors[droppedLoot[0].rarity]}">${droppedLoot[0].item}</span>.`, MAX_EVENTS);
+      handleEvent(setEvents, (
+        <>
+          You claimed: <span style={{ color: rarityColors[droppedLoot[0].rarity] }}>{droppedLoot[0].item}</span>.
+        </>
+      ), MAX_EVENTS);
     } else {
       handleEvent(setEvents, 'You claimed the reward. There was no loot.', MAX_EVENTS);
     }
-  
+    setDroppedLoot([]); // Clear the stored loot after claiming
     setPopupVisible(false);
     setMonsterEncounter(null);
     setHeroHealth(INITIAL_HERO_HEALTH);
@@ -236,9 +237,7 @@ function Game() {
     setMonsterAnimation('idle');
   };
   
-  
 
-  
   useEffect(() => {
     if (!lockedChest && !foundDoor && !monsterEncounter) {
       const interval = setInterval(() => {
@@ -267,11 +266,11 @@ function Game() {
           handleEvent(setEvents, encounterMessage, MAX_EVENTS);
         }
       }, 500);
-  
+
       return () => clearInterval(interval);
     }
   }, [floor, lockedChest, foundDoor, monsterEncounter]);
-  
+
   return (
     <div className="Game">
       <header className="App-header">
@@ -299,7 +298,7 @@ function Game() {
       <div className="Events-container">
         {events.map((event, index) => (
           <div key={index} className="Event">
-            {event}
+            {typeof event === 'string' ? event : <>{event}</>}
           </div>
         ))}
         {chestInteraction && (
@@ -359,7 +358,6 @@ function Game() {
       )}
     </div>
   );
-  }
-  
-  export default Game;
-  
+}
+
+export default Game;
