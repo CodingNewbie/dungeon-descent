@@ -1,5 +1,4 @@
-// src/components/Floor.js
-import { selectMonster } from '../utils/SelectMonsters';
+import selectMonster from '../utils/selectMonster';
 
 const MAX_ENCOUNTER_COUNT = 6;
 const MAX_ROOM_COUNT = 5;

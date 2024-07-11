@@ -1,6 +1,6 @@
 import monsters from '../config/Monsters';
 
-export const selectMonster = () => {
+const selectMonster = () => {
   const random = Math.random();
   let cumulativeProbability = 0;
 
@@ -11,5 +11,7 @@ export const selectMonster = () => {
     }
   }
 
-  return monsters[monsters.length - 1]; // Default to the last monster if something goes wrong
+  return monsters[0]; 
 };
+
+export default selectMonster;

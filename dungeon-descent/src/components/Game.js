@@ -9,13 +9,23 @@ import DoorInteraction from './interactions/DoorInteraction';
 import MonsterInteraction from './interactions/MonsterInteraction';
 import Inventory from './Inventory';
 import { handleEvent } from '../utils/gameUtils';
-import { selectMonster } from '../utils/SelectMonsters';
+import selectMonster from '../utils/selectMonster';
+import selectLoot from '../utils/selectLoot';
+import monsters from '../config/Monsters';
 import { MAX_EVENTS, INITIAL_HERO_HEALTH, INITIAL_MONSTER_HEALTH } from '../constants';
 import '../styles/App.css';
 import '../styles/EventsContainer.css';
 import '../styles/InfoContainer.css';
 import '../styles/StatsContainer.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
+
+const rarityColors = {
+  Common: '#FFFFFF',
+  Uncommon: '#00FF00',
+  Rare: '#0000FF',
+  Epic: '#800080',
+  Legendary: '#FFA500'
+};
 
 function Game() {
   const [events, setEvents] = useState([]);
@@ -44,9 +54,13 @@ function Game() {
   const [requiredXP, setRequiredXP] = useState(100);
   const [heroLevel, setHeroLevel] = useState(1);
   const [gold, setGold] = useState(0);
-  const [inventory, setInventory] = useState(['Sword', 'Axe', 'Shield', 'Helmet']);
+  const [inventory, setInventory] = useState([
+    { item: 'Sword', rarity: 'Common' },
+    { item: 'Shield', rarity: 'Common' },
+    { item: 'Potion', rarity: 'Common' },
+    { item: 'Helmet', rarity: 'Common' }
+  ]);
   const [showInventory, setShowInventory] = useState(false);
-
 
   const eventsEndRef = useRef(null);
   const combatLogsEndRef = useRef(null);
@@ -139,10 +153,10 @@ function Game() {
     setCombatLogs(['Combat begins!']);
     let heroTurn = true;
     let continueCombat = true;
-
+  
     const combatStep = () => {
       if (!continueCombat) return;
-
+  
       if (heroTurn) {
         setMonsterHealth((prevHealth) => {
           const newHealth = prevHealth - 200;
@@ -162,6 +176,17 @@ function Game() {
               }
               return newXP;
             });
+  
+            const currentMonster = monsters.find(monster => monster.type === monsterType);
+            const droppedLoot = selectLoot(currentMonster.lootTable);
+            if (droppedLoot.length > 0) {
+              setCombatLogs((prevLogs) => [
+                ...prevLogs,
+                `You found: <span style="color: ${rarityColors[droppedLoot[0].rarity]}">${droppedLoot[0].item}</span>.`
+              ]);
+              setInventory(prevInventory => [...prevInventory, ...droppedLoot]);
+            }
+  
             continueCombat = false;
             return 0;
           }
@@ -182,17 +207,27 @@ function Game() {
         });
       }
       heroTurn = !heroTurn;
-
+  
       if (heroHealth > 0 && monsterHealth > 0 && continueCombat) {
         setTimeout(combatStep, 1000);
       }
     };
-
+  
     setTimeout(combatStep, 1000);
   };
+  
 
   const handleClaimReward = () => {
-    handleEvent(setEvents, 'You claimed the reward.', MAX_EVENTS);
+    const currentMonster = monsters.find(monster => monster.type === monsterType);
+    const droppedLoot = selectLoot(currentMonster.lootTable);
+    
+    if (droppedLoot.length > 0) {
+      setInventory((prevInventory) => [...prevInventory, ...droppedLoot]);
+      handleEvent(setEvents, `You claimed the reward. You found: <span style="color: ${rarityColors[droppedLoot[0].rarity]}">${droppedLoot[0].item}</span>.`, MAX_EVENTS);
+    } else {
+      handleEvent(setEvents, 'You claimed the reward. There was no loot.', MAX_EVENTS);
+    }
+  
     setPopupVisible(false);
     setMonsterEncounter(null);
     setHeroHealth(INITIAL_HERO_HEALTH);
@@ -200,7 +235,10 @@ function Game() {
     setMonsterStatus('alive');
     setMonsterAnimation('idle');
   };
+  
+  
 
+  
   useEffect(() => {
     if (!lockedChest && !foundDoor && !monsterEncounter) {
       const interval = setInterval(() => {

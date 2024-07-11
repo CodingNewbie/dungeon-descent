@@ -20,13 +20,8 @@
     z-index: 1000;
   }
   
-  .Inventory-content-wrapper {
-    position: relative;
-    top: -200px; 
-    z-index: 1001;
-  }
-  
   .Inventory-content {
+    position: relative;
     width: 300px;
     background: black;
     color: white;
@@ -34,21 +29,22 @@
     padding-inline: 10px;
     padding-bottom: 10px;
     border-radius: 5px;
+    z-index: 1001; 
   }
   
   .Inventory-content ul {
-    list-style-type: none; 
+    list-style-type: none;
     padding: 0;
     margin: 0;
   }
   
   .Inventory-content li {
-    width: 100%; 
+    width: 100%;
     cursor: pointer;
   }
   
   .Inventory-content li:hover {
-    background-color: grey; 
+    background-color: grey;
   }
   
   .Inventory-header {
