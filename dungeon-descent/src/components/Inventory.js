@@ -16,7 +16,7 @@ const Inventory = ({ items, onClose }) => (
     <div className="Inventory-content">
       <div className="Inventory-header">
         <h2>Inventory</h2>
-        <span className="Inventory-close" onClick={onClose}>X</span>
+        <span className="Inventory-close" onClick={onClose}>&times;</span>
       </div>
       <ul>
         {items.map((item, index) => (
