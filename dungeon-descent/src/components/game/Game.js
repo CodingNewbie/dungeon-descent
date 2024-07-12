@@ -8,16 +8,17 @@ import ChestInteraction from './interactions/ChestInteraction';
 import DoorInteraction from './interactions/DoorInteraction';
 import MonsterInteraction from './interactions/MonsterInteraction';
 import Inventory from './Inventory';
-import { handleEvent } from '../utils/gameUtils';
-import selectMonster from '../utils/selectMonster';
-import selectLoot from '../utils/selectLoot';
-import monsters from '../config/Monsters';
-import { MAX_EVENTS, INITIAL_HERO_HEALTH, INITIAL_MONSTER_HEALTH } from '../constants';
-import '../styles/App.css';
-import '../styles/EventsContainer.css';
-import '../styles/InfoContainer.css';
-import '../styles/StatsContainer.css';
+import { handleEvent } from '../../utils/gameUtils';
+import selectMonster from '../../utils/selectMonster';
+import selectLoot from '../../utils/selectLoot';
+import monsters from '../../config/Monsters';
+import { MAX_EVENTS, INITIAL_HERO_HEALTH, INITIAL_MONSTER_HEALTH } from '../../constants';
+import '../../styles/game/App.css';
+import '../../styles/game/EventsContainer.css';
+import '../../styles/game/InfoContainer.css';
+import '../../styles/game/StatsContainer.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
+
 
 const rarityColors = {
   Common: '#FFFFFF',
@@ -30,7 +31,7 @@ const rarityColors = {
 function Game() {
   const [events, setEvents] = useState([]);
   const [character, setCharacter] = useState(createCharacter('Khor'));
-  const [floor] = useState(new Floor());
+  const [floor, setFloor] = useState(new Floor());
   const [stats] = useState(new Stats());
   const [lockedChest, setLockedChest] = useState(false);
   const [chestInteraction, setChestInteraction] = useState(null);
@@ -95,7 +96,7 @@ function Game() {
       setMonsterAnimation('idle');
       setCombatLogs([]);
       setPopupVisible(true);
-      handleCombatPhase();
+      handleCombatPhase(selectedMonster.type); // Pass the monster type to the combat phase
     } else {
       const result = roll < 0.5 ? 'The chest is empty.' : 'You found 100 gold.';
       if (roll >= 0.5) {
@@ -115,11 +116,21 @@ function Game() {
 
   const handleDoorOpen = () => {
     if (isBossRoom) {
-      floor.changeFloors();
-      setCurrentFloor(floor.depth);
-      setCurrentRoom(1);
-      setIsBossRoom(false);
-      handleEvent(setEvents, 'You entered the boss room and moved to the next floor.', MAX_EVENTS);
+      const bossMonster = monsters.find(monster => monster.isBoss);
+      if (bossMonster) {
+        setMonsterType(bossMonster.type);
+        setMonsterHealth(INITIAL_MONSTER_HEALTH);
+        setMonsterStatus('alive');
+        setMonsterXP(bossMonster.xp);
+        setMonsterGold(bossMonster.gold);
+        setMonsterAnimation('idle');
+        setCombatLogs([]);
+        setPopupVisible(true);
+        console.log(`Entering boss room. Boss: ${bossMonster.type}`);
+        handleCombatPhase(bossMonster.type);  // Pass the boss type to the combat phase
+      } else {
+        console.error('No boss monster found!');
+      }
     } else {
       floor.changeRooms();
       setCurrentRoom(floor.roomCount);
@@ -142,7 +153,7 @@ function Game() {
     setMonsterAnimation('idle');
     setCombatLogs([]);
     setPopupVisible(true);
-    handleCombatPhase();
+    handleCombatPhase(monsterType); // Pass the current monster type to the combat phase
   };
 
   const handleFlee = () => {
@@ -150,7 +161,7 @@ function Game() {
     setMonsterEncounter(null);
   };
 
-  const handleCombatPhase = () => {
+  const handleCombatPhase = (initialMonsterType) => {
     setCombatLogs(['Combat begins!']);
     let heroTurn = true;
     let continueCombat = true;
@@ -163,29 +174,45 @@ function Game() {
           const newHealth = prevHealth - 200;
           setIsMonsterHit(true);
           setTimeout(() => setIsMonsterHit(false), 200);
-          setCombatLogs((prevLogs) => [...prevLogs, `You dealt 200 damage to the ${monsterType}.`]);
+          setCombatLogs((prevLogs) => [...prevLogs, `You dealt 200 damage to the ${initialMonsterType}.`]);
           if (newHealth <= 0) {
-            setCombatLogs((prevLogs) => [...prevLogs, `${monsterType} dropped ${monsterGold} gold.`]);
+            console.log(`${initialMonsterType} defeated. Gold dropped: ${monsterGold}`);
+            setCombatLogs((prevLogs) => [...prevLogs, `${initialMonsterType} dropped ${monsterGold} gold.`]);
             setMonsterStatus('dead');
             setGold(prevGold => prevGold + monsterGold);
             setHeroXP(prevXP => {
               const newXP = prevXP + monsterXP;
               if (newXP >= requiredXP) {
                 setHeroLevel(prevLevel => prevLevel + 1);
-                setRequiredXP(prevXP => prevXP + 100);
+                setRequiredXP(prev => prev + 100);
                 return newXP - requiredXP;
               }
               return newXP;
             });
 
-            const currentMonster = monsters.find(monster => monster.type === monsterType);
-            const loot = selectLoot(currentMonster.lootTable);
-            setDroppedLoot(loot); // Store the dropped loot
-            if (loot.length > 0) {
-              setCombatLogs((prevLogs) => [
-                ...prevLogs,
-                `You found: <span style="color: ${rarityColors[loot[0].rarity]}">${loot[0].item}</span>.`
-              ]);
+            const currentMonster = monsters.find(monster => monster.type === initialMonsterType);
+            console.log('Current Monster:', currentMonster);
+
+            if (currentMonster) {
+              const loot = selectLoot(currentMonster.lootTable);
+              setDroppedLoot(loot); // Store the dropped loot
+              if (loot.length > 0) {
+                setCombatLogs((prevLogs) => [
+                  ...prevLogs,
+                  `You found: <span style="color: ${rarityColors[loot[0].rarity]}">${loot[0].item}</span>.`
+                ]);
+              }
+            } else {
+              console.error('Monster not found:', initialMonsterType);
+            }
+
+            if (initialMonsterType === 'gorehoof-the-ravager') {
+              console.log("Boss defeated. Progressing to next floor.");
+              setIsBossRoom(false); // Ensure this is set before changing floors
+              floor.changeFloors();
+              setCurrentFloor(floor.depth);
+              setCurrentRoom(1);
+              handleEvent(setEvents, 'You defeated the boss and progressed to the next floor!', MAX_EVENTS);
             }
 
             continueCombat = false;
@@ -197,7 +224,7 @@ function Game() {
         setHeroHealth((prevHealth) => {
           setMonsterAnimation('attack');
           const newHealth = prevHealth - 100;
-          setCombatLogs((prevLogs) => [...prevLogs, `${monsterType} dealt 100 damage to you.`]);
+          setCombatLogs((prevLogs) => [...prevLogs, `${initialMonsterType} dealt 100 damage to you.`]);
           if (newHealth <= 0) {
             setCombatLogs((prevLogs) => [...prevLogs, 'You have died.']);
             continueCombat = false;
@@ -228,7 +255,8 @@ function Game() {
     } else {
       handleEvent(setEvents, 'You claimed the reward. There was no loot.', MAX_EVENTS);
     }
-    setDroppedLoot([]); // Clear the stored loot after claiming
+
+    setDroppedLoot([]); 
     setPopupVisible(false);
     setMonsterEncounter(null);
     setHeroHealth(INITIAL_HERO_HEALTH);
@@ -236,12 +264,12 @@ function Game() {
     setMonsterStatus('alive');
     setMonsterAnimation('idle');
   };
-  
 
   useEffect(() => {
-    if (!lockedChest && !foundDoor && !monsterEncounter) {
+    if (!lockedChest && !foundDoor && !monsterEncounter && !popupVisible) {
       const interval = setInterval(() => {
         const encounterMessage = floor.getEncounter();
+        console.log("Encounter message:", encounterMessage);
         if (encounterMessage === 'You found a locked chest.') {
           setLockedChest(true);
           setChestInteraction(encounterMessage);
@@ -265,12 +293,12 @@ function Game() {
           }
           handleEvent(setEvents, encounterMessage, MAX_EVENTS);
         }
-      }, 500);
-
+      }, 100);
+  
       return () => clearInterval(interval);
     }
-  }, [floor, lockedChest, foundDoor, monsterEncounter]);
-
+  }, [floor, lockedChest, foundDoor, monsterEncounter, popupVisible]);
+  
   return (
     <div className="Game">
       <header className="App-header">

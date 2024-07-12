@@ -1,5 +1,7 @@
 import React, { useRef, useEffect } from 'react';
-import '../styles/CombatEventContainer.css';
+import '../../styles/game/CombatEventContainer.css';
+
+
 
 function CombatEventContainer({ combatLogs, onClaimReward, monsterDefeated }) {
   const combatLogsEndRef = useRef(null);

@@ -1,4 +1,4 @@
-import selectMonster from '../utils/selectMonster';
+import selectMonster from '../../utils/selectMonster';
 
 const MAX_ENCOUNTER_COUNT = 6;
 const MAX_ROOM_COUNT = 5;
@@ -32,6 +32,7 @@ class Floor {
     this.depth++;
     this.roomCount = 1;
     this.encounterCount = 0;
+    console.log(`Changed to Floor: ${this.depth}, Room: ${this.roomCount}`);
   }
 
   handleChest() {

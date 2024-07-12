@@ -4,7 +4,9 @@ import HealthBar from './HealthBar';
 import MonsterImage from './MonsterImage';
 import HeroInfo from './HeroInfo';
 import CombatEventContainer from './CombatEventContainer';
-import '../styles/EncounterPopup.css';
+import '../../styles/game/EncounterPopup.css';
+
+
 
 function EncounterPopup({ monster, hero, combatLogs, onClaimReward, monsterHealth, monsterStatus, monsterType, monsterAnimation, isMonsterHit }) {
   return (

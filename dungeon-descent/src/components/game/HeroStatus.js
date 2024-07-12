@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Inventory from './Inventory';
-import '../styles/HeroStatus.css';
+import '../../styles/game/HeroStatus.css';
+
+
 
 const HeroStatus = ({ name, level, currentXP, requiredXP, gold, inventory }) => {
   const [showInventory, setShowInventory] = useState(false);

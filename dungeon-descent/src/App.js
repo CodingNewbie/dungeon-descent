@@ -1,9 +1,9 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import LandingPage from './components/LandingPage';
-import Game from './components/Game';
-import './styles/App.css';
-import './styles/LandingPage.css';
+import LandingPage from './components/landing/LandingPage';
+import Game from './components/game/Game';
+import './styles/game/App.css';
+import './styles/landing/LandingPage.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import Nav from './components/Nav';
 

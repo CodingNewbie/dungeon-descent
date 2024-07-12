@@ -50,6 +50,17 @@ const monsters = [
       { item: 'Soul Gem', probability: 0.08, rarity: 'Epic' },
       { item: 'Necromancer Amulet', probability: 0.02, rarity: 'Legendary' }
     ]
+  },
+  {
+    type: 'gorehoof-the-ravager',
+    isBoss: true,
+    xp: 200,
+    gold: 500,
+    lootTable: [
+      { item: 'Gorehoof Antler', probability: 0.5, rarity: 'Epic' },
+      { item: 'Ravager Hide', probability: 0.3, rarity: 'Legendary' },
+      { item: 'Moose Meat', probability: 0.2, rarity: 'Rare' }
+    ]
   }
 ];
 

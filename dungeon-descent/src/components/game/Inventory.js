@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import '../styles/Inventory.css';
+import '../../styles/game/Inventory.css';
+
+
 
 const rarityColors = {
   Common: '#FFFFFF',
