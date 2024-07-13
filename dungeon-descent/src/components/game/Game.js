@@ -96,7 +96,7 @@ function Game() {
       setMonsterAnimation('idle');
       setCombatLogs([]);
       setPopupVisible(true);
-      handleCombatPhase(selectedMonster.type); // Pass the monster type to the combat phase
+      handleCombatPhase(selectedMonster.type); 
     } else {
       const result = roll < 0.5 ? 'The chest is empty.' : 'You found 100 gold.';
       if (roll >= 0.5) {
@@ -127,7 +127,7 @@ function Game() {
         setCombatLogs([]);
         setPopupVisible(true);
         console.log(`Entering boss room. Boss: ${bossMonster.type}`);
-        handleCombatPhase(bossMonster.type);  // Pass the boss type to the combat phase
+        handleCombatPhase(bossMonster.type);  
       } else {
         console.error('No boss monster found!');
       }
@@ -153,7 +153,7 @@ function Game() {
     setMonsterAnimation('idle');
     setCombatLogs([]);
     setPopupVisible(true);
-    handleCombatPhase(monsterType); // Pass the current monster type to the combat phase
+    handleCombatPhase(monsterType);
   };
 
   const handleFlee = () => {
@@ -161,23 +161,23 @@ function Game() {
     setMonsterEncounter(null);
   };
 
-  const handleCombatPhase = (initialMonsterType) => {
+  const handleCombatPhase = (monsterType) => {
     setCombatLogs(['Combat begins!']);
     let heroTurn = true;
     let continueCombat = true;
-
+  
     const combatStep = () => {
       if (!continueCombat) return;
-
+  
       if (heroTurn) {
         setMonsterHealth((prevHealth) => {
           const newHealth = prevHealth - 200;
           setIsMonsterHit(true);
           setTimeout(() => setIsMonsterHit(false), 200);
-          setCombatLogs((prevLogs) => [...prevLogs, `You dealt 200 damage to the ${initialMonsterType}.`]);
+          setCombatLogs((prevLogs) => [...prevLogs, `You dealt 200 damage to the ${monsterType}.`]);
           if (newHealth <= 0) {
-            console.log(`${initialMonsterType} defeated. Gold dropped: ${monsterGold}`);
-            setCombatLogs((prevLogs) => [...prevLogs, `${initialMonsterType} dropped ${monsterGold} gold.`]);
+            console.log(`${monsterType} defeated. Gold dropped: ${monsterGold}`);
+            setCombatLogs((prevLogs) => [...prevLogs, `${monsterType} dropped ${monsterGold} gold.`]);
             setMonsterStatus('dead');
             setGold(prevGold => prevGold + monsterGold);
             setHeroXP(prevXP => {
@@ -189,13 +189,13 @@ function Game() {
               }
               return newXP;
             });
-
-            const currentMonster = monsters.find(monster => monster.type === initialMonsterType);
+  
+            const currentMonster = monsters.find(monster => monster.type === monsterType);
             console.log('Current Monster:', currentMonster);
-
+  
             if (currentMonster) {
               const loot = selectLoot(currentMonster.lootTable);
-              setDroppedLoot(loot); // Store the dropped loot
+              setDroppedLoot(loot);
               if (loot.length > 0) {
                 setCombatLogs((prevLogs) => [
                   ...prevLogs,
@@ -203,18 +203,18 @@ function Game() {
                 ]);
               }
             } else {
-              console.error('Monster not found:', initialMonsterType);
+              console.error('Monster not found:', monsterType);
             }
-
-            if (initialMonsterType === 'gorehoof-the-ravager') {
+  
+            if (monsterType === 'gorehoof-the-ravager') {
               console.log("Boss defeated. Progressing to next floor.");
-              setIsBossRoom(false); // Ensure this is set before changing floors
+              setIsBossRoom(false);
               floor.changeFloors();
               setCurrentFloor(floor.depth);
               setCurrentRoom(1);
               handleEvent(setEvents, 'You defeated the boss and progressed to the next floor!', MAX_EVENTS);
             }
-
+  
             continueCombat = false;
             return 0;
           }
@@ -224,7 +224,7 @@ function Game() {
         setHeroHealth((prevHealth) => {
           setMonsterAnimation('attack');
           const newHealth = prevHealth - 100;
-          setCombatLogs((prevLogs) => [...prevLogs, `${initialMonsterType} dealt 100 damage to you.`]);
+          setCombatLogs((prevLogs) => [...prevLogs, `${monsterType} dealt 100 damage to you.`]);
           if (newHealth <= 0) {
             setCombatLogs((prevLogs) => [...prevLogs, 'You have died.']);
             continueCombat = false;
@@ -235,14 +235,15 @@ function Game() {
         });
       }
       heroTurn = !heroTurn;
-
+  
       if (heroHealth > 0 && monsterHealth > 0 && continueCombat) {
-        setTimeout(combatStep, 1000);
+        setTimeout(combatStep, 100);
       }
     };
-
-    setTimeout(combatStep, 1000);
+  
+    setTimeout(combatStep, 100);
   };
+  
 
   const handleClaimReward = () => {
     if (droppedLoot.length > 0) {
