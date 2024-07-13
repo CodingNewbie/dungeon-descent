@@ -5,12 +5,10 @@ import Game from './components/game/Game';
 import './styles/game/App.css';
 import './styles/landing/LandingPage.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import Nav from './components/Nav';
 
 function App() {
   return (
     <Router basename="/dungeon-descent">
-      <Nav />
       <div className="App">
         <Routes>
           <Route path="/" element={<LandingPage />} />
