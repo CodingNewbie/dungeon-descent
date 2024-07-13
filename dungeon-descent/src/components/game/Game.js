@@ -161,87 +161,96 @@ function Game() {
     setMonsterEncounter(null);
   };
 
+  // 0 - no one's turn
+  // 1 - hero's turn
+  // 2 - monster's turn
+  const [characterTurn, setCharacterTurn] = useState(0);
+
+  useEffect(() => {
+    if(characterTurn == 1) {
+      handleHeroTurn();
+    }
+    else if(characterTurn == 2) {
+      handleMonsterTurn();
+    }
+  }, [characterTurn]);
+
+  const handleHeroTurn = () => {
+    console.log("Hero move");
+    const newHealth = monsterHealth - 200;
+    setIsMonsterHit(true);
+    setTimeout(() => setIsMonsterHit(false), 200);
+    setCombatLogs((prevLogs) => [...prevLogs, `You dealt 200 damage to the ${monsterType}.`]);
+    setMonsterHealth(newHealth);
+
+    if (newHealth <= 0) {
+      console.log(`${monsterType} defeated. Gold dropped: ${monsterGold}`);
+      setCombatLogs((prevLogs) => [...prevLogs, `${monsterType} dropped ${monsterGold} gold.`]);
+      setMonsterStatus('dead');
+      setGold(prevGold => prevGold + monsterGold);
+      setHeroXP(prevXP => {
+        const newXP = prevXP + monsterXP;
+        if (newXP >= requiredXP) {
+          setHeroLevel(prevLevel => prevLevel + 1);
+          setRequiredXP(prev => prev + 100);
+          return newXP - requiredXP;
+        }
+        return newXP;
+      });
+
+      const currentMonster = monsters.find(monster => monster.type === monsterType);
+      console.log('Current Monster:', currentMonster);
+
+      if (currentMonster) {
+        const loot = selectLoot(currentMonster.lootTable);
+        setDroppedLoot(loot);
+        if (loot.length > 0) {
+          setCombatLogs((prevLogs) => [
+            ...prevLogs,
+            `You found: <span style="color: ${rarityColors[loot[0].rarity]}">${loot[0].item}</span>.`
+          ]);
+        }
+      } else {
+        console.error('Monster not found:', monsterType);
+      }
+      
+      setCharacterTurn(0);
+      if (monsterType === 'gorehoof-the-ravager') {
+        console.log("Boss defeated. Progressing to next floor.");
+        setIsBossRoom(false);
+        floor.changeFloors();
+        setCurrentFloor(floor.depth);
+        setCurrentRoom(1);
+        handleEvent(setEvents, 'You defeated the boss and progressed to the next floor!', MAX_EVENTS);
+      }
+     
+    }
+    else {
+      setCharacterTurn(2);
+    }
+  }
+
+  const handleMonsterTurn = () => {
+    console.log("Monster move");
+    setMonsterAnimation('attack');
+    const newHealth = heroHealth - 100;
+    setCombatLogs((prevLogs) => [...prevLogs, `${monsterType} dealt 100 damage to you.`]);
+    setHeroHealth(newHealth);
+
+    if (newHealth <= 0) {
+      setCombatLogs((prevLogs) => [...prevLogs, 'You have died.']);
+      setCharacterTurn(0);
+    }
+    else {
+      setCharacterTurn(1);
+    }
+
+    setTimeout(() => setMonsterAnimation('idle'), 500);
+  }
+
   const handleCombatPhase = (monsterType) => {
     setCombatLogs(['Combat begins!']);
-    let heroTurn = true;
-    let continueCombat = true;
-  
-    const combatStep = () => {
-      if (!continueCombat) return;
-  
-      if (heroTurn) {
-        setMonsterHealth((prevHealth) => {
-          const newHealth = prevHealth - 200;
-          setIsMonsterHit(true);
-          setTimeout(() => setIsMonsterHit(false), 200);
-          setCombatLogs((prevLogs) => [...prevLogs, `You dealt 200 damage to the ${monsterType}.`]);
-          if (newHealth <= 0) {
-            console.log(`${monsterType} defeated. Gold dropped: ${monsterGold}`);
-            setCombatLogs((prevLogs) => [...prevLogs, `${monsterType} dropped ${monsterGold} gold.`]);
-            setMonsterStatus('dead');
-            setGold(prevGold => prevGold + monsterGold);
-            setHeroXP(prevXP => {
-              const newXP = prevXP + monsterXP;
-              if (newXP >= requiredXP) {
-                setHeroLevel(prevLevel => prevLevel + 1);
-                setRequiredXP(prev => prev + 100);
-                return newXP - requiredXP;
-              }
-              return newXP;
-            });
-  
-            const currentMonster = monsters.find(monster => monster.type === monsterType);
-            console.log('Current Monster:', currentMonster);
-  
-            if (currentMonster) {
-              const loot = selectLoot(currentMonster.lootTable);
-              setDroppedLoot(loot);
-              if (loot.length > 0) {
-                setCombatLogs((prevLogs) => [
-                  ...prevLogs,
-                  `You found: <span style="color: ${rarityColors[loot[0].rarity]}">${loot[0].item}</span>.`
-                ]);
-              }
-            } else {
-              console.error('Monster not found:', monsterType);
-            }
-  
-            if (monsterType === 'gorehoof-the-ravager') {
-              console.log("Boss defeated. Progressing to next floor.");
-              setIsBossRoom(false);
-              floor.changeFloors();
-              setCurrentFloor(floor.depth);
-              setCurrentRoom(1);
-              handleEvent(setEvents, 'You defeated the boss and progressed to the next floor!', MAX_EVENTS);
-            }
-  
-            continueCombat = false;
-            return 0;
-          }
-          return newHealth;
-        });
-      } else {
-        setHeroHealth((prevHealth) => {
-          setMonsterAnimation('attack');
-          const newHealth = prevHealth - 100;
-          setCombatLogs((prevLogs) => [...prevLogs, `${monsterType} dealt 100 damage to you.`]);
-          if (newHealth <= 0) {
-            setCombatLogs((prevLogs) => [...prevLogs, 'You have died.']);
-            continueCombat = false;
-            return 0;
-          }
-          setTimeout(() => setMonsterAnimation('idle'), 500);
-          return newHealth;
-        });
-      }
-      heroTurn = !heroTurn;
-  
-      if (heroHealth > 0 && monsterHealth > 0 && continueCombat) {
-        setTimeout(combatStep, 100);
-      }
-    };
-  
-    setTimeout(combatStep, 100);
+    setCharacterTurn(1);
   };
   
 
