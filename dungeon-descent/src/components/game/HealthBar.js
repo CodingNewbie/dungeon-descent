@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import '../styles/HealthBar.css';
+import '../../styles/game/HealthBar.css';
+
+
 
 function HealthBar({ current, total }) {
   const [isShaking, setIsShaking] = useState(false);

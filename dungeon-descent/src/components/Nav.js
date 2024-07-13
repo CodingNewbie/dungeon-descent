@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import Game from "./Game";
-import LandingPage from "./LandingPage";
+import Game from "./game/Game";
+import LandingPage from "./landing/LandingPage";
 
 function Nav() {
     return (
