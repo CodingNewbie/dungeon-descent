@@ -1,6 +1,6 @@
 {
   "files": {
-    "main.css": "/dungeon-descent/static/css/main.0984d461.css",
+    "main.css": "/dungeon-descent/static/css/main.4c285077.css",
     "main.js": "/dungeon-descent/static/js/main.7a99865c.js",
     "static/js/453.ec0a8669.chunk.js": "/dungeon-descent/static/js/453.ec0a8669.chunk.js",
     "static/media/fa-solid-900.ttf": "/dungeon-descent/static/media/fa-solid-900.bacd5de623fb563b961a.ttf",
@@ -12,12 +12,12 @@
     "static/media/fa-v4compatibility.ttf": "/dungeon-descent/static/media/fa-v4compatibility.c8e090db312b0bea2aa2.ttf",
     "static/media/fa-v4compatibility.woff2": "/dungeon-descent/static/media/fa-v4compatibility.cf7f5903d06b79ad60f1.woff2",
     "index.html": "/dungeon-descent/index.html",
-    "main.0984d461.css.map": "/dungeon-descent/static/css/main.0984d461.css.map",
+    "main.4c285077.css.map": "/dungeon-descent/static/css/main.4c285077.css.map",
     "main.7a99865c.js.map": "/dungeon-descent/static/js/main.7a99865c.js.map",
     "453.ec0a8669.chunk.js.map": "/dungeon-descent/static/js/453.ec0a8669.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.0984d461.css",
+    "static/css/main.4c285077.css",
     "static/js/main.7a99865c.js"
   ]
 }
