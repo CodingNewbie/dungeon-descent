@@ -9,18 +9,15 @@
   background-color: black;
   color: white;
   text-align: left;
-  font-size: 14px; 
 }
 
 .CombatEvent {
   margin-bottom: 5px;
-  font-size: 14px;
 }
 
 .claim-reward {
   margin-top: 10px;
   text-align: left;
-  font-size: 14px; 
 }
 
 .CombatEventContainer button {
