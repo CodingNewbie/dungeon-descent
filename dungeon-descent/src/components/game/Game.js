@@ -292,6 +292,7 @@ function Game() {
 
   const handleCombatPhase = (monsterType) => {
     setCombatLogs(['Combat begins!']);
+    backgroundAudioRef.current.pause(); // Stop background audio
     combatAudioRef.current.currentTime = 0; // Reset combat audio to the start
     combatAudioRef.current.play().catch((error) => {
       console.log('Error playing combat audio:', error);
@@ -318,6 +319,7 @@ function Game() {
     setMonsterHealth(INITIAL_MONSTER_HEALTH);
     setMonsterStatus('alive');
     setMonsterAnimation('idle');
+    combatAudioRef.current.pause(); // Stop combat audio
     backgroundAudioRef.current.play().catch((error) => {
       console.log('Error playing background audio:', error);
     });
