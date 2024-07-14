@@ -6,14 +6,12 @@ import HeroInfo from './HeroInfo';
 import CombatEventContainer from './CombatEventContainer';
 import '../../styles/game/EncounterPopup.css';
 
-
-
 function EncounterPopup({ monster, hero, combatLogs, onClaimReward, monsterHealth, monsterStatus, monsterType, monsterAnimation, isMonsterHit }) {
   return (
     <div>
-      <div className="popup-overlay" onClick={onClaimReward}></div>
+      <div className="EncounterPopup-overlay" onClick={onClaimReward}></div>
       <div className="EncounterPopup">
-        <div className="popup-content">
+        <div className="EncounterPopup-content">
           <MonsterInfo name={monster.name} level={monster.level} />
           <HealthBar current={monster.currentHealth} total={monster.totalHealth} />
           <MonsterImage type={monster.type} status={monster.status} animation={monsterAnimation} isHit={isMonsterHit} />

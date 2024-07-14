@@ -18,6 +18,7 @@ import '../../styles/game/EventsContainer.css';
 import '../../styles/game/InfoContainer.css';
 import '../../styles/game/StatsContainer.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import IntroPopup from './IntroPopup';
 
 const rarityColors = {
   Common: '#FFFFFF',
@@ -54,15 +55,14 @@ function Game() {
   const [requiredXP, setRequiredXP] = useState(100);
   const [heroLevel, setHeroLevel] = useState(1);
   const [gold, setGold] = useState(0);
-  const [inventory, setInventory] = useState([
-    { item: 'Sword', rarity: 'Common' },
-    { item: 'Shield', rarity: 'Common' },
-    { item: 'Potion', rarity: 'Common' },
-    { item: 'Helmet', rarity: 'Common' }
-  ]);
+  const [inventory, setInventory] = useState([]);
   const [showInventory, setShowInventory] = useState(false);
   const [droppedLoot, setDroppedLoot] = useState([]);
+  const [characterTurn, setCharacterTurn] = useState(0);
+  const [showIntroPopup, setShowIntroPopup] = useState(true);
 
+  const backgroundAudioRef = useRef(null);
+  const combatAudioRef = useRef(null);
   const eventsEndRef = useRef(null);
   const combatLogsEndRef = useRef(null);
 
@@ -86,7 +86,7 @@ function Game() {
   const handleChestOpen = () => {
     const roll = Math.random();
     if (roll < 0.3) {
-      const selectedMonster = selectMonster();
+      const selectedMonster = monsters.find(monster => monster.type === 'mimic');
       initializeCombat(selectedMonster);
     } else {
       const result = roll < 0.5 ? 'The chest is empty.' : 'You found 100 gold.';
@@ -165,8 +165,6 @@ function Game() {
     handleEvent(setEvents, `You fled from the ${monsterType}.`, MAX_EVENTS);
     setMonsterEncounter(null);
   };
-
-  const [characterTurn, setCharacterTurn] = useState(0);
 
   useEffect(() => {
     if (characterTurn === 1) {
@@ -294,6 +292,10 @@ function Game() {
 
   const handleCombatPhase = (monsterType) => {
     setCombatLogs(['Combat begins!']);
+    combatAudioRef.current.currentTime = 0; // Reset combat audio to the start
+    combatAudioRef.current.play().catch((error) => {
+      console.log('Error playing combat audio:', error);
+    });
     setCharacterTurn(1);
   };
 
@@ -316,6 +318,9 @@ function Game() {
     setMonsterHealth(INITIAL_MONSTER_HEALTH);
     setMonsterStatus('alive');
     setMonsterAnimation('idle');
+    backgroundAudioRef.current.play().catch((error) => {
+      console.log('Error playing background audio:', error);
+    });
   };
 
   useEffect(() => {
@@ -437,6 +442,17 @@ function Game() {
           onClose={() => setShowInventory(false)}
         />
       )}
+      {showIntroPopup && (
+        <IntroPopup onConfirm={() => {
+          setShowIntroPopup(false);
+          backgroundAudioRef.current.currentTime = 0;
+          backgroundAudioRef.current.play().catch((error) => {
+            console.log('Error playing background audio on load:', error);
+          });
+        }} />
+      )}
+      <audio ref={backgroundAudioRef} src="./audio/background.ogg" loop />
+      <audio ref={combatAudioRef} src="./audio/combat.ogg" />
     </div>
   );
 }
