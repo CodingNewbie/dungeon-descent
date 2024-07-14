@@ -63,6 +63,7 @@ function Game() {
 
   const backgroundAudioRef = useRef(null);
   const combatAudioRef = useRef(null);
+  const bossAudioRef = useRef(null);
   const eventsEndRef = useRef(null);
   const combatLogsEndRef = useRef(null);
 
@@ -292,11 +293,18 @@ function Game() {
 
   const handleCombatPhase = (monsterType) => {
     setCombatLogs(['Combat begins!']);
-    backgroundAudioRef.current.pause(); // Stop background audio
-    combatAudioRef.current.currentTime = 0; // Reset combat audio to the start
-    combatAudioRef.current.play().catch((error) => {
-      console.log('Error playing combat audio:', error);
-    });
+    backgroundAudioRef.current.pause();
+    if (monsterType === 'gorehoof-the-ravager') {
+      bossAudioRef.current.currentTime = 0; // Reset boss audio to the start
+      bossAudioRef.current.play().catch((error) => {
+        console.log('Error playing boss audio:', error);
+      });
+    } else {
+      combatAudioRef.current.currentTime = 0; // Reset combat audio to the start
+      combatAudioRef.current.play().catch((error) => {
+        console.log('Error playing combat audio:', error);
+      });
+    }
     setCharacterTurn(1);
   };
 
@@ -319,7 +327,8 @@ function Game() {
     setMonsterHealth(INITIAL_MONSTER_HEALTH);
     setMonsterStatus('alive');
     setMonsterAnimation('idle');
-    combatAudioRef.current.pause(); // Stop combat audio
+    combatAudioRef.current.pause();
+    bossAudioRef.current.pause();
     backgroundAudioRef.current.play().catch((error) => {
       console.log('Error playing background audio:', error);
     });
@@ -454,7 +463,8 @@ function Game() {
         }} />
       )}
       <audio ref={backgroundAudioRef} src="./audio/background.ogg" loop />
-      <audio ref={combatAudioRef} src="./audio/combat.ogg" />
+      <audio ref={combatAudioRef} src="./audio/battle.ogg" />
+      <audio ref={bossAudioRef} src="./audio/boss-battle.ogg" />
     </div>
   );
 }
