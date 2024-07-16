@@ -1,11 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import '../../styles/landing/LandingPage.css';
-
+import Nav from './Nav';
 
 function LandingPage() {
     return (
         <div className="LandingPage">
+            <Nav />
             <header className="LandingPage-header">
                 <h1>Descent</h1>
                 <p>Your adventure awaits...</p>

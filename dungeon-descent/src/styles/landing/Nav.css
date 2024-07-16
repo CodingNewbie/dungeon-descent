@@ -1,0 +1,90 @@
+/* Nav.css */
+.nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    /* background-image: url('path_to_your_image.jpg'); Add your background image here */
+    background-attachment: fixed;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    padding: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+.nav-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.nav-links {
+    display: flex;
+    gap: 1rem;
+}
+
+.nav-link {
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-weight: 500;
+    position: relative;
+    overflow: hidden;
+    transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+    color: #fff;
+}
+
+.nav-link::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+    border-radius: 25px;
+    transition: transform 0.3s ease;
+    z-index: -1;
+}
+
+.nav-link:hover::before {
+    transform: scaleX(1);
+}
+
+.nav-link::before {
+    transform: scaleX(0);
+    transform-origin: right;
+}
+
+
+/* Style for tablet screens */
+@media (max-width: 1024px) {
+    .nav {
+        flex: 1 1 45%;
+        /* Half width for tablet screens */
+        background-color: #61dafb;
+    }
+}
+
+
+/* Styles for mobile phone screens */
+@media (max-width: 768px) {
+    .nav {
+        flex: 1 1 100%;
+        /* Full width for smaller screens */
+        background-color: bisque;
+    }
+}
