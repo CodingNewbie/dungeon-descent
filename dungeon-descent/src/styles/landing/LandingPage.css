@@ -1,6 +1,7 @@
 .LandingPage {
   text-align: center;
   background-color: #282c34;
+  background-image: linear-gradient(to bottom, #583125, #49281f, #3a1f19, #2c1712, #1f0e08);
   color: white;
   min-height: 100vh;
   display: flex;
