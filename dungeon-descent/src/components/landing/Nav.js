@@ -72,7 +72,7 @@ const NavLink = styled(Link)`
 function Nav() {
     useEffect(() => {
         const handleScroll = () => {
-            const scrollTop = window.pageYOffset;
+            const scrollTop = window.scrollY;
             const nav = document.querySelector('.nav');
             nav.style.backgroundPositionY = `${scrollTop * 0.5}px`;
         };

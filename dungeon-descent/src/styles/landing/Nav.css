@@ -41,10 +41,14 @@
     position: relative;
     overflow: hidden;
     transition: color 0.3s ease;
+    color: white !important; /* Force white color and override any default styles */
 }
 
-.nav-link:hover {
-    color: #fff;
+.nav-link:hover,
+.nav-link:visited,
+.nav-link:active,
+.nav-link:focus {
+    color: white !important; /* Ensure white color on all states */
 }
 
 .nav-link::before {
@@ -58,17 +62,13 @@
     border-radius: 25px;
     transition: transform 0.3s ease;
     z-index: -1;
+    transform: scaleX(0);
+    transform-origin: right;
 }
 
 .nav-link:hover::before {
     transform: scaleX(1);
 }
-
-.nav-link::before {
-    transform: scaleX(0);
-    transform-origin: right;
-}
-
 
 /* Style for tablet screens */
 @media (max-width: 1024px) {
@@ -78,7 +78,6 @@
         background-color: #61dafb;
     }
 }
-
 
 /* Styles for mobile phone screens */
 @media (max-width: 768px) {
