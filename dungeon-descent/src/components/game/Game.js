@@ -18,7 +18,7 @@ import '../../styles/game/EventsContainer.css';
 import '../../styles/game/InfoContainer.css';
 import '../../styles/game/StatsContainer.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-
+import IntroPopup from './IntroPopup';
 
 const rarityColors = {
   Common: '#FFFFFF',
@@ -55,15 +55,15 @@ function Game() {
   const [requiredXP, setRequiredXP] = useState(100);
   const [heroLevel, setHeroLevel] = useState(1);
   const [gold, setGold] = useState(0);
-  const [inventory, setInventory] = useState([
-    { item: 'Sword', rarity: 'Common' },
-    { item: 'Shield', rarity: 'Common' },
-    { item: 'Potion', rarity: 'Common' },
-    { item: 'Helmet', rarity: 'Common' }
-  ]);
+  const [inventory, setInventory] = useState([]);
   const [showInventory, setShowInventory] = useState(false);
   const [droppedLoot, setDroppedLoot] = useState([]);
+  const [characterTurn, setCharacterTurn] = useState(0);
+  const [showIntroPopup, setShowIntroPopup] = useState(true);
 
+  const backgroundAudioRef = useRef(null);
+  const combatAudioRef = useRef(null);
+  const bossAudioRef = useRef(null);
   const eventsEndRef = useRef(null);
   const combatLogsEndRef = useRef(null);
 
@@ -87,55 +87,62 @@ function Game() {
   const handleChestOpen = () => {
     const roll = Math.random();
     if (roll < 0.3) {
-      const selectedMonster = selectMonster();
-      setMonsterType(selectedMonster.type);
-      setMonsterHealth(INITIAL_MONSTER_HEALTH);
-      setMonsterStatus('alive');
-      setMonsterXP(selectedMonster.xp);
-      setMonsterGold(selectedMonster.gold);
-      setMonsterAnimation('idle');
-      setCombatLogs([]);
-      setPopupVisible(true);
-      handleCombatPhase(selectedMonster.type); // Pass the monster type to the combat phase
+      const selectedMonster = monsters.find(monster => monster.type === 'mimic');
+      initializeCombat(selectedMonster);
     } else {
       const result = roll < 0.5 ? 'The chest is empty.' : 'You found 100 gold.';
       if (roll >= 0.5) {
         setGold(prevGold => prevGold + 100);
       }
       handleEvent(setEvents, result, MAX_EVENTS);
-      setLockedChest(false);
-      setChestInteraction(null);
+      resetChestState();
     }
   };
 
-  const handleChestIgnore = () => {
-    handleEvent(setEvents, 'You ignored the chest.', MAX_EVENTS);
+  const initializeCombat = (selectedMonster) => {
+    setMonsterType(selectedMonster.type);
+    setMonsterHealth(INITIAL_MONSTER_HEALTH);
+    setMonsterStatus('alive');
+    setMonsterXP(selectedMonster.xp);
+    setMonsterGold(selectedMonster.gold);
+    setMonsterAnimation('idle');
+    setCombatLogs([]);
+    setPopupVisible(true);
+    handleCombatPhase(selectedMonster.type);
+  };
+
+  const resetChestState = () => {
     setLockedChest(false);
     setChestInteraction(null);
   };
 
+  const handleChestIgnore = () => {
+    handleEvent(setEvents, 'You ignored the chest.', MAX_EVENTS);
+    resetChestState();
+  };
+
   const handleDoorOpen = () => {
     if (isBossRoom) {
-      const bossMonster = monsters.find(monster => monster.isBoss);
-      if (bossMonster) {
-        setMonsterType(bossMonster.type);
-        setMonsterHealth(INITIAL_MONSTER_HEALTH);
-        setMonsterStatus('alive');
-        setMonsterXP(bossMonster.xp);
-        setMonsterGold(bossMonster.gold);
-        setMonsterAnimation('idle');
-        setCombatLogs([]);
-        setPopupVisible(true);
-        console.log(`Entering boss room. Boss: ${bossMonster.type}`);
-        handleCombatPhase(bossMonster.type);  // Pass the boss type to the combat phase
-      } else {
-        console.error('No boss monster found!');
-      }
+      handleBossRoom();
     } else {
       floor.changeRooms();
       setCurrentRoom(floor.roomCount);
       handleEvent(setEvents, 'You opened the door and entered a new room.', MAX_EVENTS);
     }
+    resetDoorState();
+  };
+
+  const handleBossRoom = () => {
+    const bossMonster = monsters.find(monster => monster.isBoss);
+    if (bossMonster) {
+      initializeCombat(bossMonster);
+      console.log(`Entering boss room. Boss: ${bossMonster.type}`);
+    } else {
+      console.error('No boss monster found!');
+    }
+  };
+
+  const resetDoorState = () => {
     setFoundDoor(false);
     setDoorInteraction(null);
   };
@@ -143,8 +150,7 @@ function Game() {
   const handleDoorIgnore = () => {
     handleEvent(setEvents, 'You ignored it and decided to move on.', MAX_EVENTS);
     floor.encounterCount = 0;
-    setFoundDoor(false);
-    setDoorInteraction(null);
+    resetDoorState();
   };
 
   const handleEngage = () => {
@@ -153,7 +159,7 @@ function Game() {
     setMonsterAnimation('idle');
     setCombatLogs([]);
     setPopupVisible(true);
-    handleCombatPhase(monsterType); // Pass the current monster type to the combat phase
+    handleCombatPhase(monsterType);
   };
 
   const handleFlee = () => {
@@ -161,87 +167,145 @@ function Game() {
     setMonsterEncounter(null);
   };
 
-  const handleCombatPhase = (initialMonsterType) => {
+  useEffect(() => {
+    if (characterTurn === 1) {
+      handleHeroTurn();
+    } else if (characterTurn === 2) {
+      handleMonsterTurn();
+    }
+  }, [characterTurn]);
+
+  const handleHeroTurn = () => {
+    console.log("Hero move");
+    const newHealth = applyHeroDamage();
+    handleMonsterHealth(newHealth);
+
+    if (newHealth <= 0) {
+      handleMonsterDefeat();
+    } else {
+      setCharacterTurn(2);
+    }
+  };
+
+  const applyHeroDamage = () => {
+    const newHealth = monsterHealth - 200;
+    setIsMonsterHit(true);
+    setTimeout(() => setIsMonsterHit(false), 200);
+    setCombatLogs((prevLogs) => [...prevLogs, `You dealt 200 damage to the ${monsterType}.`]);
+    return newHealth;
+  };
+
+  const handleMonsterHealth = (newHealth) => {
+    setMonsterHealth(newHealth);
+  };
+
+  const updateHeroXP = () => {
+    setHeroXP(prevXP => {
+      const newXP = prevXP + monsterXP;
+      if (newXP >= requiredXP) {
+        setHeroLevel(prevLevel => prevLevel + 1);
+        setRequiredXP(prev => prev + 100);
+        return newXP - requiredXP;
+      }
+      return newXP;
+    });
+  };
+
+  const findCurrentMonster = () => {
+    const currentMonster = monsters.find(monster => monster.type === monsterType);
+    console.log('Current Monster:', currentMonster);
+    return currentMonster;
+  };
+
+  const handleLoot = (currentMonster) => {
+    if (currentMonster) {
+      const loot = selectLoot(currentMonster.lootTable);
+      setDroppedLoot(loot);
+      if (loot.length > 0) {
+        setCombatLogs((prevLogs) => [
+          ...prevLogs,
+          `You found: <span style="color: ${rarityColors[loot[0].rarity]}">${loot[0].item}</span>.`
+        ]);
+      }
+    } else {
+      console.error('Monster not found:', monsterType);
+    }
+  };
+
+  const handleBossDefeat = () => {
+    if (monsterType === 'gorehoof-the-ravager') {
+      console.log("Boss defeated. Progressing to next floor.");
+      setIsBossRoom(false);
+      floor.changeFloors();
+      setCurrentFloor(floor.depth);
+      setCurrentRoom(1);
+      handleEvent(setEvents, 'You defeated the boss and progressed to the next floor!', MAX_EVENTS);
+    }
+  };
+
+  const handleMonsterDefeat = () => {
+    console.log(`${monsterType} defeated. Gold dropped: ${monsterGold}`);
+    setCombatLogs((prevLogs) => [...prevLogs, `${monsterType} dropped ${monsterGold} gold.`]);
+    setMonsterStatus('dead');
+    setGold(prevGold => prevGold + monsterGold);
+    updateHeroXP();
+
+    const currentMonster = findCurrentMonster();
+    handleLoot(currentMonster);
+
+    setCharacterTurn(0);
+    handleBossDefeat();
+  };
+
+  const handleMonsterTurn = () => {
+    console.log("Monster move");
+    setMonsterAnimation('attack');
+    const newHealth = applyMonsterDamage();
+    handleHeroHealth(newHealth);
+
+    if (newHealth <= 0) {
+      handleHeroDeath();
+    } else {
+      setCharacterTurn(1);
+    }
+
+    resetMonsterAnimation();
+  };
+
+  const applyMonsterDamage = () => {
+    const newHealth = heroHealth - 100;
+    setCombatLogs((prevLogs) => [...prevLogs, `${monsterType} dealt 100 damage to you.`]);
+    return newHealth;
+  };
+
+  const handleHeroHealth = (newHealth) => {
+    setHeroHealth(newHealth);
+  };
+
+  const handleHeroDeath = () => {
+    setCombatLogs((prevLogs) => [...prevLogs, 'You have died.']);
+    setCharacterTurn(0);
+  };
+
+  const resetMonsterAnimation = () => {
+    setTimeout(() => setMonsterAnimation('idle'), 500);
+  };
+
+  const handleCombatPhase = (monsterType) => {
     setCombatLogs(['Combat begins!']);
-    let heroTurn = true;
-    let continueCombat = true;
-
-    const combatStep = () => {
-      if (!continueCombat) return;
-
-      if (heroTurn) {
-        setMonsterHealth((prevHealth) => {
-          const newHealth = prevHealth - 200;
-          setIsMonsterHit(true);
-          setTimeout(() => setIsMonsterHit(false), 200);
-          setCombatLogs((prevLogs) => [...prevLogs, `You dealt 200 damage to the ${initialMonsterType}.`]);
-          if (newHealth <= 0) {
-            console.log(`${initialMonsterType} defeated. Gold dropped: ${monsterGold}`);
-            setCombatLogs((prevLogs) => [...prevLogs, `${initialMonsterType} dropped ${monsterGold} gold.`]);
-            setMonsterStatus('dead');
-            setGold(prevGold => prevGold + monsterGold);
-            setHeroXP(prevXP => {
-              const newXP = prevXP + monsterXP;
-              if (newXP >= requiredXP) {
-                setHeroLevel(prevLevel => prevLevel + 1);
-                setRequiredXP(prev => prev + 100);
-                return newXP - requiredXP;
-              }
-              return newXP;
-            });
-
-            const currentMonster = monsters.find(monster => monster.type === initialMonsterType);
-            console.log('Current Monster:', currentMonster);
-
-            if (currentMonster) {
-              const loot = selectLoot(currentMonster.lootTable);
-              setDroppedLoot(loot); // Store the dropped loot
-              if (loot.length > 0) {
-                setCombatLogs((prevLogs) => [
-                  ...prevLogs,
-                  `You found: <span style="color: ${rarityColors[loot[0].rarity]}">${loot[0].item}</span>.`
-                ]);
-              }
-            } else {
-              console.error('Monster not found:', initialMonsterType);
-            }
-
-            if (initialMonsterType === 'gorehoof-the-ravager') {
-              console.log("Boss defeated. Progressing to next floor.");
-              setIsBossRoom(false); // Ensure this is set before changing floors
-              floor.changeFloors();
-              setCurrentFloor(floor.depth);
-              setCurrentRoom(1);
-              handleEvent(setEvents, 'You defeated the boss and progressed to the next floor!', MAX_EVENTS);
-            }
-
-            continueCombat = false;
-            return 0;
-          }
-          return newHealth;
-        });
-      } else {
-        setHeroHealth((prevHealth) => {
-          setMonsterAnimation('attack');
-          const newHealth = prevHealth - 100;
-          setCombatLogs((prevLogs) => [...prevLogs, `${initialMonsterType} dealt 100 damage to you.`]);
-          if (newHealth <= 0) {
-            setCombatLogs((prevLogs) => [...prevLogs, 'You have died.']);
-            continueCombat = false;
-            return 0;
-          }
-          setTimeout(() => setMonsterAnimation('idle'), 500);
-          return newHealth;
-        });
-      }
-      heroTurn = !heroTurn;
-
-      if (heroHealth > 0 && monsterHealth > 0 && continueCombat) {
-        setTimeout(combatStep, 1000);
-      }
-    };
-
-    setTimeout(combatStep, 1000);
+    backgroundAudioRef.current.pause();
+    if (monsterType === 'gorehoof-the-ravager') {
+      bossAudioRef.current.currentTime = 0; // Reset boss audio to the start
+      bossAudioRef.current.play().catch((error) => {
+        console.log('Error playing boss audio:', error);
+      });
+    } else {
+      combatAudioRef.current.currentTime = 0; // Reset combat audio to the start
+      combatAudioRef.current.play().catch((error) => {
+        console.log('Error playing combat audio:', error);
+      });
+    }
+    setCharacterTurn(1);
   };
 
   const handleClaimReward = () => {
@@ -256,13 +320,18 @@ function Game() {
       handleEvent(setEvents, 'You claimed the reward. There was no loot.', MAX_EVENTS);
     }
 
-    setDroppedLoot([]); 
+    setDroppedLoot([]);
     setPopupVisible(false);
     setMonsterEncounter(null);
     setHeroHealth(INITIAL_HERO_HEALTH);
     setMonsterHealth(INITIAL_MONSTER_HEALTH);
     setMonsterStatus('alive');
     setMonsterAnimation('idle');
+    combatAudioRef.current.pause();
+    bossAudioRef.current.pause();
+    backgroundAudioRef.current.play().catch((error) => {
+      console.log('Error playing background audio:', error);
+    });
   };
 
   useEffect(() => {
@@ -285,7 +354,7 @@ function Game() {
           setMonsterType(monster.type);
           setMonsterXP(monster.xp);
           setMonsterGold(monster.gold);
-          setMonsterEncounter(`You encountered a ${monster.type}`);
+          setMonsterEncounter(`You encountered a ${monster.type.charAt(0).toUpperCase() + monster.type.slice(1)}`);
         } else {
           if (encounterMessage === 'You moved to the next floor.') {
             setCurrentFloor(floor.depth);
@@ -294,11 +363,11 @@ function Game() {
           handleEvent(setEvents, encounterMessage, MAX_EVENTS);
         }
       }, 100);
-  
+
       return () => clearInterval(interval);
     }
   }, [floor, lockedChest, foundDoor, monsterEncounter, popupVisible]);
-  
+
   return (
     <div className="Game">
       <header className="App-header">
@@ -384,6 +453,18 @@ function Game() {
           onClose={() => setShowInventory(false)}
         />
       )}
+      {showIntroPopup && (
+        <IntroPopup onConfirm={() => {
+          setShowIntroPopup(false);
+          backgroundAudioRef.current.currentTime = 0;
+          backgroundAudioRef.current.play().catch((error) => {
+            console.log('Error playing background audio on load:', error);
+          });
+        }} />
+      )}
+      <audio ref={backgroundAudioRef} src="./audio/background.ogg" loop />
+      <audio ref={combatAudioRef} src="./audio/battle.ogg" />
+      <audio ref={bossAudioRef} src="./audio/boss-battle.ogg" />
     </div>
   );
 }
