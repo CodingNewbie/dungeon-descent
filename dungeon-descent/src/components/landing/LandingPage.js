@@ -6,6 +6,7 @@ import Footer from './Footer';
 import Hero from './Hero';
 import About from './About';
 import Community from './Community';
+import GameInfo from './GameInfo';
 import { Parallax, ParallaxLayer } from '@react-spring/parallax';
 import background from '../../assets/background.png';
 import mainbackground from '../../assets/mainbackground.png';
@@ -16,25 +17,17 @@ function LandingPage() {
     return (
         <div className="LandingPage">
             <Nav />
-            <header className="LandingPage-header">
-                <h1>Descent</h1>
-                <p>Your adventure awaits...</p>
-                <Link to="/game">
-                    <button>Start Game</button>
-                </Link>
-            </header>
-
-            <Parallax pages={3}>
+            <Parallax pages={4}>
                 <ParallaxLayer
                     offset={0}
                     speed={0.1}
                     style={{
                         backgroundImage: `url(${foreground})`,
-                        backgroundSize: 'cover'
+                        backgroundSize: 'cover',
                     }}
                 />
 
-                <ParallaxLayer offset={0.3} speed={6} className='hero-about'>
+                <ParallaxLayer offset={0.3} speed={0.6} className='hero-about'>
                     <Hero />
                 </ParallaxLayer>
 
@@ -42,8 +35,22 @@ function LandingPage() {
                     <About />
                 </ParallaxLayer>
 
-                <ParallaxLayer offset={2} speed={1}>
+                <ParallaxLayer offset={1.9} speed={1}>
+                    <GameInfo />
+                </ParallaxLayer>
+
+                <ParallaxLayer offset={2.2} speed={1.2}>
                     <Community />
+                </ParallaxLayer>
+
+                <ParallaxLayer offset={0} speed={0.5}>
+                    <header className="LandingPage-header">
+                        <h1>Descent</h1>
+                        <p>Your adventure awaits...</p>
+                        <Link to="/game">
+                            <button>Start Game</button>
+                        </Link>
+                    </header>
                 </ParallaxLayer>
             </Parallax>
             <Footer />
