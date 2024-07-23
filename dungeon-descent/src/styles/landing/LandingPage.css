@@ -1,6 +1,7 @@
 .LandingPage {
   text-align: center;
   background-color: #282c34;
+  background-image: linear-gradient(to bottom, #583125, #49281f, #3a1f19, #2c1712, #1f0e08);
   color: white;
   min-height: 100vh;
   display: flex;
@@ -24,14 +25,15 @@
   padding: 10px 20px;
   font-size: 1em;
   cursor: pointer;
-  background-color: #61dafb;
+  background-color: #000000;
+  color: white;
   border: none;
   border-radius: 5px;
   transition: background-color 0.3s ease;
 }
 
 .LandingPage button:hover {
-  background-color: #21a1f1;
+  background-color: #767b7e;
 }
 
 .LandingPage-about {
