@@ -4,7 +4,6 @@
     top: 0;
     left: 0;
     width: 100%;
-    /* background-image: url('path_to_your_image.jpg'); Add your background image here */
     background-attachment: fixed;
     background-size: cover;
     background-repeat: no-repeat;
@@ -75,7 +74,6 @@
     .nav {
         flex: 1 1 45%;
         /* Half width for tablet screens */
-        background-color: #61dafb;
     }
 }
 
@@ -84,6 +82,5 @@
     .nav {
         flex: 1 1 100%;
         /* Full width for smaller screens */
-        background-color: bisque;
     }
 }

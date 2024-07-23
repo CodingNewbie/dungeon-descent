@@ -84,11 +84,9 @@ function Nav() {
     return (
         <NavContainer className="nav">
             <NavContent>
-                <Logo>DD</Logo>
                 <NavLinks>
                     <NavLink to="/game-info">Game info ▼</NavLink>
                     <NavLink to="/token">Token</NavLink>
-                    <NavLink to="/about">About</NavLink>
                 </NavLinks>
                 <div className="nav-buttons">
                     {/* Additional buttons or links can be added here */}
