@@ -1,6 +1,6 @@
 .LandingPage {
   text-align: center;
-  background-color: #282c34;
+  background-image: linear-gradient(to bottom, #583125, #49281f, #3a1f19, #2c1712, #1f0e08);
   color: white;
   min-height: 100vh;
   display: flex;
@@ -10,51 +10,187 @@
   font-family: 'Arial', sans-serif;
 }
 
-.LandingPage-header {
-  font-size: 2em;
-}
-
 .LandingPage p {
   font-size: 1.2em;
   margin: 20px 0;
 }
 
+/* HERO SECTION */
+.hero-body h1 {
+  color: black;
+  font-family: "Tiny5", sans-serif;
+  font-size: 4rem;
+}
+
 .LandingPage button {
-  margin-top: 20px;
+  margin-top: 70px;
   padding: 10px 20px;
-  font-size: 1em;
+  font-size: 4em;
+  font-family: "Tiny5", sans-serif;
   cursor: pointer;
-  background-color: #61dafb;
+  background-color: #583125;
+  color: white;
   border: none;
   border-radius: 5px;
   transition: background-color 0.3s ease;
 }
 
 .LandingPage button:hover {
-  background-color: #21a1f1;
+  background-color: #9a7063;
 }
 
+/* ABOUT SECTION */
 .LandingPage-about {
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+  margin: 25px;
+  border: 6px dashed #9a7063;
+  border-radius: 8px;
+}
+
+.LandingPage-about h2 {
+  font-family: "Tiny5", sans-serif;
+  font-size: 6rem;
+}
+
+.LandingPage-about p {
+  margin: 2rem 6rem;
+  font-family: "Pixelify Sans", sans-serif;
+  font-size: 2rem;
 }
 
 
+/* GAME INFORMATION */
+.game-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+  margin: 25px;
+  border: 6px dashed #9a7063;
+  border-radius: 8px;
+}
 
-/* Style for tablet screens */
-@media (max-width: 1024px) {
-  .LandingPage {
-    flex: 1 1 45%;
-    /* Half width for tablet screens */
-    background-color: #61dafb;
+.game-info h2 {
+  font-family: "Tiny5", sans-serif;
+  font-size: 6rem;
+}
+
+.game-info p {
+  margin: 2rem 6rem;
+  font-family: "Pixelify Sans", sans-serif;
+  font-size: 2rem;
+}
+
+/* COMMUNITY SECTION */
+.LandingPage-community {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+  margin: 25px;
+  border: 6px dashed #9a7063;
+  border-radius: 8px;
+}
+
+.LandingPage-community h2 {
+  font-family: "Tiny5", sans-serif;
+  font-size: 6rem;
+}
+
+.LandingPage-community p {
+  margin: 2rem 6rem;
+  font-family: "Pixelify Sans", sans-serif;
+  font-size: 2rem;
+}
+
+/* SOCIAL ICONS */
+.social-icons {
+  display: flex;
+  justify-content: center;
+  margin: 1.3rem;
+}
+
+
+.social-icons a {
+  margin: 0 10px;
+  color: black;
+  transition: color 0.3s;
+  font-size: 1.5rem;
+}
+
+.social-icons a:hover {
+  color: rgb(128, 125, 125);
+}
+
+/* MEDIA QUERIES */
+
+@media (max-width: 1400px) {
+
+  .LandingPage-about h2,
+  .game-info h2,
+  .LandingPage-community h2 {
+    font-size: 5rem;
+  }
+
+  .LandingPage-about p,
+  .game-info p,
+  .LandingPage-community p {
+    margin: 1rem 4rem;
+    font-size: 1.5rem;
+  }
+
+  .LandingPage button {
+    font-size: 3em;
   }
 }
 
-
-/* Styles for mobile phone screens */
 @media (max-width: 768px) {
-  .LandingPage {
-    flex: 1 1 100%;
-    /* Full width for smaller screens */
-    background-color: bisque;
+
+  .LandingPage-about h2,
+  .game-info h2,
+  .LandingPage-community h2 {
+    font-size: 4rem;
+  }
+
+  .LandingPage-about p,
+  .game-info p,
+  .LandingPage-community p {
+    margin: 1rem 2rem;
+    font-size: 1.2rem;
+  }
+
+  .LandingPage button {
+    font-size: 2em;
+    margin-top: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .LandingPage-about h2,
+  .game-info h2,
+  .LandingPage-community h2 {
+    font-size: 3rem;
+  }
+
+  .LandingPage-about p,
+  .game-info p,
+  .LandingPage-community p {
+    margin: 0.5rem 1rem;
+    font-size: 1rem;
+  }
+
+  .LandingPage button {
+    font-size: 1.5em;
+    margin-top: 20px;
+    padding: 8px 16px;
+  }
+
+  .social-icons a {
+    font-size: 1.2rem;
+    margin: 0 5px;
   }
 }

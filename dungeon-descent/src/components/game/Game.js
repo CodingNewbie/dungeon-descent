@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback} from 'react';
 import { createCharacter } from './Character';
 import { Floor } from './Floor';
 import { Stats, StatsDisplay, BonusStatsDisplay } from './Stats';
@@ -12,7 +12,7 @@ import { handleEvent } from '../../utils/gameUtils';
 import selectMonster from '../../utils/selectMonster';
 import selectLoot from '../../utils/selectLoot';
 import monsters from '../../config/Monsters';
-import { MAX_EVENTS, INITIAL_HERO_HEALTH, INITIAL_MONSTER_HEALTH } from '../../constants';
+import { MAX_EVENTS } from '../../constants';
 import '../../styles/game/App.css';
 import '../../styles/game/EventsContainer.css';
 import '../../styles/game/InfoContainer.css';
@@ -43,8 +43,9 @@ function Game() {
   const [monsterEncounter, setMonsterEncounter] = useState(null);
   const [popupVisible, setPopupVisible] = useState(false);
   const [combatLogs, setCombatLogs] = useState([]);
-  const [heroHealth, setHeroHealth] = useState(INITIAL_HERO_HEALTH);
-  const [monsterHealth, setMonsterHealth] = useState(INITIAL_MONSTER_HEALTH);
+  const [heroHealth, setHeroHealth] = useState(character.getHp());
+  const [monsterHealth, setMonsterHealth] = useState(0);
+  const [monsterStats, setMonsterStats] = useState(new Stats());
   const [monsterStatus, setMonsterStatus] = useState('alive');
   const [monsterType, setMonsterType] = useState('skeleton');
   const [monsterXP, setMonsterXP] = useState(0);
@@ -79,6 +80,10 @@ function Game() {
     }
   }, [combatLogs, popupVisible]);
 
+  useEffect(() => {
+    setHeroHealth(character.getHp());
+  }, [character]);
+
   const handleCreateCharacter = () => {
     const newCharacter = createCharacter('Bob');
     setCharacter(newCharacter);
@@ -99,9 +104,13 @@ function Game() {
     }
   };
 
-  const initializeCombat = (selectedMonster) => {
+  const initializeCombat = useCallback((selectedMonster) => {
+    console.log('Initializing combat with monster:', selectedMonster);
     setMonsterType(selectedMonster.type);
-    setMonsterHealth(INITIAL_MONSTER_HEALTH);
+    setMonsterStats(selectedMonster.stats);
+    const monsterHp = selectedMonster.stats.getHp();
+    console.log(`Initializing combat with monster: ${selectedMonster.type}, Health: ${monsterHp}`);
+    setMonsterHealth(monsterHp);
     setMonsterStatus('alive');
     setMonsterXP(selectedMonster.xp);
     setMonsterGold(selectedMonster.gold);
@@ -109,7 +118,9 @@ function Game() {
     setCombatLogs([]);
     setPopupVisible(true);
     handleCombatPhase(selectedMonster.type);
-  };
+  }, []);
+  
+  
 
   const resetChestState = () => {
     setLockedChest(false);
@@ -154,7 +165,7 @@ function Game() {
   };
 
   const handleEngage = () => {
-    setMonsterHealth(INITIAL_MONSTER_HEALTH);
+    setMonsterHealth(monsterStats.getHp()); 
     setMonsterStatus('alive');
     setMonsterAnimation('idle');
     setCombatLogs([]);
@@ -323,8 +334,8 @@ function Game() {
     setDroppedLoot([]);
     setPopupVisible(false);
     setMonsterEncounter(null);
-    setHeroHealth(INITIAL_HERO_HEALTH);
-    setMonsterHealth(INITIAL_MONSTER_HEALTH);
+    setHeroHealth(character.getHp());
+    setMonsterHealth(monsterStats.getHp());
     setMonsterStatus('alive');
     setMonsterAnimation('idle');
     combatAudioRef.current.pause();
@@ -338,7 +349,7 @@ function Game() {
     if (!lockedChest && !foundDoor && !monsterEncounter && !popupVisible) {
       const interval = setInterval(() => {
         const encounterMessage = floor.getEncounter();
-        console.log("Encounter message:", encounterMessage);
+        console.log("Encounter message:", encounterMessage); 
         if (encounterMessage === 'You found a locked chest.') {
           setLockedChest(true);
           setChestInteraction(encounterMessage);
@@ -351,10 +362,17 @@ function Game() {
           setIsBossRoom(true);
         } else if (encounterMessage.startsWith('You encountered a')) {
           const monster = selectMonster();
-          setMonsterType(monster.type);
-          setMonsterXP(monster.xp);
-          setMonsterGold(monster.gold);
-          setMonsterEncounter(`You encountered a ${monster.type.charAt(0).toUpperCase() + monster.type.slice(1)}`);
+          console.log('Selected Monster:', monster); 
+          if (monster && monster.stats) {
+            setMonsterType(monster.type);
+            setMonsterXP(monster.xp);
+            setMonsterGold(monster.gold);
+            setMonsterStats(monster.stats); 
+            setMonsterHealth(monster.stats.getHp());
+            setMonsterEncounter(`You encountered a ${monster.type.charAt(0).toUpperCase() + monster.type.slice(1)}`);
+          } else {
+            console.error('Monster or monster stats not found:', monster);
+          }
         } else {
           if (encounterMessage === 'You moved to the next floor.') {
             setCurrentFloor(floor.depth);
@@ -363,11 +381,12 @@ function Game() {
           handleEvent(setEvents, encounterMessage, MAX_EVENTS);
         }
       }, 100);
-
+  
       return () => clearInterval(interval);
     }
   }, [floor, lockedChest, foundDoor, monsterEncounter, popupVisible]);
-
+  
+      
   return (
     <div className="Game">
       <header className="App-header">
@@ -428,15 +447,15 @@ function Game() {
             name: monsterType.charAt(0).toUpperCase() + monsterType.slice(1),
             level: 10,
             currentHealth: monsterHealth,
-            totalHealth: INITIAL_MONSTER_HEALTH,
+            totalHealth: monsterStats.getHp(),
             type: monsterType,
             status: monsterStatus
           }}
           hero={{
-            name: 'Khor',
-            level: 10,
+            name: character.name,
+            level: heroLevel,
             currentHealth: heroHealth,
-            totalHealth: INITIAL_HERO_HEALTH,
+            totalHealth: character.getHp(),
           }}
           combatLogs={combatLogs}
           onClaimReward={handleClaimReward}
