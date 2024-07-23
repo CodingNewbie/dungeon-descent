@@ -43,15 +43,7 @@ function LandingPage() {
                     <Community />
                 </ParallaxLayer>
 
-                <ParallaxLayer offset={0} speed={0.5}>
-                    <header className="LandingPage-header">
-                        <h1>Descent</h1>
-                        <p>Your adventure awaits...</p>
-                        <Link to="/game">
-                            <button>Start Game</button>
-                        </Link>
-                    </header>
-                </ParallaxLayer>
+
             </Parallax>
             <Footer />
         </div>
