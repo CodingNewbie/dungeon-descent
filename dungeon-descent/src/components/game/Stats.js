@@ -2,7 +2,7 @@ import React from 'react';
 
 class Stats {
   constructor() {
-    this.hp = 250;
+    this.hp = 1000;
     this.atk = 50;
     this.def = 50;
     this.atkSpd = 0.5;

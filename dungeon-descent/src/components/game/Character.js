@@ -1,19 +1,26 @@
+import { Stats } from './Stats';
+
 class Character {
-    constructor() {
-      this.name = "";
-    }
-    set_name(name) {
-      this.name = name;
-    }
+  constructor() {
+    this.name = "";
+    this.stats = new Stats();
   }
-  
-  function createCharacter(name) {
-    const character = new Character();
-    character.set_name(name);
-    return character;
+
+  set_name(name) {
+    this.name = name;
   }
-  
+
+  getHp() {
+    return this.stats.getHp();
+  }
+}
+
+function createCharacter(name) {
   const character = new Character();
-  
-  export { Character, createCharacter };
-  
+  character.set_name(name);
+  return character;
+}
+
+const character = new Character();
+
+export { Character, createCharacter };
