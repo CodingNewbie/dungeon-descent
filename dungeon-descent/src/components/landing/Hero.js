@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import '../../styles/landing/LandingPage.css';
-import '../../styles/landing/Hero.css';
+import SocialIcons from "./SocialIcons";
 
 import { Parallax, ParallaxLayer } from "@react-spring/parallax";
 
