@@ -368,7 +368,7 @@ function Game() {
             setMonsterXP(monster.xp);
             setMonsterGold(monster.gold);
             setMonsterStats(monster.stats); 
-            setMonsterHealth(monster.stats.getHp());
+            setMonsterHealth(monster.stats.getHp()); // Initialize health from stats
             setMonsterEncounter(`You encountered a ${monster.type.charAt(0).toUpperCase() + monster.type.slice(1)}`);
           } else {
             console.error('Monster or monster stats not found:', monster);
