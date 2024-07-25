@@ -92,7 +92,7 @@ function Game() {
   const handleChestOpen = () => {
     const roll = Math.random();
     if (roll < 0.3) {
-      const selectedMonster = monsters.find(monster => monster.type === 'mimic');
+      const selectedMonster = monsters.find(monster => monster.type === 'Mimic');
       initializeCombat(selectedMonster);
     } else {
       const result = roll < 0.5 ? 'The chest is empty.' : 'You found 100 gold.';
@@ -120,8 +120,6 @@ function Game() {
     handleCombatPhase(selectedMonster.type);
   }, []);
   
-  
-
   const resetChestState = () => {
     setLockedChest(false);
     setChestInteraction(null);
@@ -227,6 +225,7 @@ function Game() {
     console.log('Current Monster:', currentMonster);
     return currentMonster;
   };
+  
 
   const handleLoot = (currentMonster) => {
     if (currentMonster) {
@@ -244,14 +243,12 @@ function Game() {
   };
 
   const handleBossDefeat = () => {
-    if (monsterType === 'gorehoof-the-ravager') {
-      console.log("Boss defeated. Progressing to next floor.");
-      setIsBossRoom(false);
-      floor.changeFloors();
-      setCurrentFloor(floor.depth);
-      setCurrentRoom(1);
-      handleEvent(setEvents, 'You defeated the boss and progressed to the next floor!', MAX_EVENTS);
-    }
+    console.log("Boss defeated. Progressing to next floor.");
+    setIsBossRoom(false);
+    floor.changeFloors();
+    setCurrentFloor(floor.depth);
+    setCurrentRoom(1);
+    handleEvent(setEvents, 'You defeated the boss and progressed to the next floor!', MAX_EVENTS);
   };
 
   const handleMonsterDefeat = () => {
@@ -260,14 +257,16 @@ function Game() {
     setMonsterStatus('dead');
     setGold(prevGold => prevGold + monsterGold);
     updateHeroXP();
-
+  
     const currentMonster = findCurrentMonster();
     handleLoot(currentMonster);
-
     setCharacterTurn(0);
-    handleBossDefeat();
+  
+    if (currentMonster && currentMonster.isBoss) {
+      handleBossDefeat();
+    }
   };
-
+  
   const handleMonsterTurn = () => {
     console.log("Monster move");
     setMonsterAnimation('attack');
