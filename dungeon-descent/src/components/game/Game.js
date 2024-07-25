@@ -92,7 +92,7 @@ function Game() {
   const handleChestOpen = () => {
     const roll = Math.random();
     if (roll < 0.3) {
-      const selectedMonster = monsters.find(monster => monster.type === 'mimic');
+      const selectedMonster = monsters.find(monster => monster.type === 'Mimic');
       initializeCombat(selectedMonster);
     } else {
       const result = roll < 0.5 ? 'The chest is empty.' : 'You found 100 gold.';
@@ -120,8 +120,6 @@ function Game() {
     handleCombatPhase(selectedMonster.type);
   }, []);
   
-  
-
   const resetChestState = () => {
     setLockedChest(false);
     setChestInteraction(null);
@@ -143,8 +141,14 @@ function Game() {
     resetDoorState();
   };
 
+  const getRandomBoss = () => {
+    const bosses = monsters.filter(monster => monster.isBoss);
+    const randomIndex = Math.floor(Math.random() * bosses.length);
+    return bosses[randomIndex];
+  };
+  
   const handleBossRoom = () => {
-    const bossMonster = monsters.find(monster => monster.isBoss);
+    const bossMonster = getRandomBoss();
     if (bossMonster) {
       initializeCombat(bossMonster);
       console.log(`Entering boss room. Boss: ${bossMonster.type}`);
@@ -227,6 +231,7 @@ function Game() {
     console.log('Current Monster:', currentMonster);
     return currentMonster;
   };
+  
 
   const handleLoot = (currentMonster) => {
     if (currentMonster) {
@@ -244,14 +249,12 @@ function Game() {
   };
 
   const handleBossDefeat = () => {
-    if (monsterType === 'gorehoof-the-ravager') {
-      console.log("Boss defeated. Progressing to next floor.");
-      setIsBossRoom(false);
-      floor.changeFloors();
-      setCurrentFloor(floor.depth);
-      setCurrentRoom(1);
-      handleEvent(setEvents, 'You defeated the boss and progressed to the next floor!', MAX_EVENTS);
-    }
+    console.log("Boss defeated. Progressing to next floor.");
+    setIsBossRoom(false);
+    floor.changeFloors();
+    setCurrentFloor(floor.depth);
+    setCurrentRoom(1);
+    handleEvent(setEvents, 'You defeated the boss and progressed to the next floor!', MAX_EVENTS);
   };
 
   const handleMonsterDefeat = () => {
@@ -260,14 +263,16 @@ function Game() {
     setMonsterStatus('dead');
     setGold(prevGold => prevGold + monsterGold);
     updateHeroXP();
-
+  
     const currentMonster = findCurrentMonster();
     handleLoot(currentMonster);
-
     setCharacterTurn(0);
-    handleBossDefeat();
+  
+    if (currentMonster && currentMonster.isBoss) {
+      handleBossDefeat();
+    }
   };
-
+  
   const handleMonsterTurn = () => {
     console.log("Monster move");
     setMonsterAnimation('attack');
@@ -368,7 +373,7 @@ function Game() {
             setMonsterXP(monster.xp);
             setMonsterGold(monster.gold);
             setMonsterStats(monster.stats); 
-            setMonsterHealth(monster.stats.getHp());
+            setMonsterHealth(monster.stats.getHp()); // Initialize health from stats
             setMonsterEncounter(`You encountered a ${monster.type.charAt(0).toUpperCase() + monster.type.slice(1)}`);
           } else {
             console.error('Monster or monster stats not found:', monster);

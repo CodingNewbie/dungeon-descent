@@ -49,7 +49,7 @@ class Floor {
   }
 
   handleCorpse() {
-    return "You found the corpse of Mitch McConnell.";
+    return "You found a corpse.";
   }
 
   handleNothing() {
