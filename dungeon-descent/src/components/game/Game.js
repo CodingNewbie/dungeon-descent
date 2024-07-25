@@ -141,8 +141,14 @@ function Game() {
     resetDoorState();
   };
 
+  const getRandomBoss = () => {
+    const bosses = monsters.filter(monster => monster.isBoss);
+    const randomIndex = Math.floor(Math.random() * bosses.length);
+    return bosses[randomIndex];
+  };
+  
   const handleBossRoom = () => {
-    const bossMonster = monsters.find(monster => monster.isBoss);
+    const bossMonster = getRandomBoss();
     if (bossMonster) {
       initializeCombat(bossMonster);
       console.log(`Entering boss room. Boss: ${bossMonster.type}`);

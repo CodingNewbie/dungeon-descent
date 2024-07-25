@@ -227,6 +227,7 @@ const monsters = [
   },
   {
     type: 'Bramblehoof the Brutal',
+    probability: 0.2,
     isBoss: true,
     xp: 250,
     gold: 600,
@@ -239,6 +240,7 @@ const monsters = [
   },
   {
     type: 'Cragmar the Enforcer',
+    probability: 0.2,
     isBoss: true,
     xp: 270,
     gold: 650,
@@ -251,6 +253,7 @@ const monsters = [
   },
   {
     type: 'Gorehoof the Ravager',
+    probability: 0.2,
     isBoss: true,
     xp: 200,
     gold: 500,
@@ -263,6 +266,7 @@ const monsters = [
   },
   {
     type: 'Magnar Brightpeak',
+    probability: 0.2,
     isBoss: true,
     xp: 280,
     gold: 700,
@@ -275,6 +279,7 @@ const monsters = [
   },
   {
     type: 'Moorok the Hammerhoof',
+    probability: 0.2,
     isBoss: true,
     xp: 300,
     gold: 750,
@@ -287,6 +292,7 @@ const monsters = [
   },
   {
     type: 'Staghammer the Enchanted',
+    probability: 0.2,
     isBoss: true,
     xp: 320,
     gold: 800,
@@ -299,6 +305,7 @@ const monsters = [
   },
   {
     type: 'Thralik the Unyielding',
+    probability: 0.2,
     isBoss: true,
     xp: 350,
     gold: 900,
@@ -311,6 +318,7 @@ const monsters = [
   },
   {
     type: 'Violetgrove the Colossal',
+    probability: 0.2,
     isBoss: true,
     xp: 400,
     gold: 1000,
