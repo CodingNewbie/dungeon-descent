@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import '../../styles/game/Inventory.css';
 
@@ -18,10 +18,13 @@ const Inventory = ({ items, onClose, onItemClick, onSellItems }) => {
   };
 
   const handleSell = () => {
-    if (onSellItems) {
-      onSellItems(selectedRarity);
-    }
+    onSellItems(selectedRarity);
   };
+
+  useEffect(() => {
+    const dropdown = document.querySelector('.Inventory-rarity-dropdown');
+    dropdown.style.color = rarityColors[selectedRarity];
+  }, [selectedRarity]);
 
   return (
     <div className="Inventory">
@@ -38,24 +41,30 @@ const Inventory = ({ items, onClose, onItemClick, onSellItems }) => {
             value={selectedRarity}
             onChange={handleRarityChange}
           >
-            {Object.keys(rarityColors).map(rarity => (
-              <option key={rarity} value={rarity} style={{ color: rarityColors[rarity] }}>
+            {Object.keys(rarityColors).map((rarity) => (
+              <option
+                key={rarity}
+                value={rarity}
+                className={rarity}
+              >
                 {rarity}
               </option>
             ))}
           </select>
         </div>
         <ul>
-          {items.map((item, index) => (
-            <li
-              key={index}
-              style={{ color: rarityColors[item.rarity] }}
-              onClick={() => onItemClick(item)}
-            >
-              <i className={`ra ${item.icon}`} style={{ color: rarityColors[item.rarity], marginRight: '10px' }}></i>
-              {item.name}
-            </li>
-          ))}
+          {items.map((item, index) => {
+            return (
+              <li
+                key={index}
+                style={{ color: rarityColors[item.rarity] }}
+                onClick={() => onItemClick(item)}
+              >
+                <i className={`ra ${item.icon}`} style={{ color: rarityColors[item.rarity], marginRight: '10px' }}></i>
+                {item.name}
+              </li>
+            );
+          })}
         </ul>
       </div>
     </div>
@@ -66,8 +75,7 @@ Inventory.propTypes = {
   items: PropTypes.arrayOf(PropTypes.shape({
     name: PropTypes.string.isRequired,
     rarity: PropTypes.string.isRequired,
-    icon: PropTypes.string.isRequired,
-    price: PropTypes.number.isRequired
+    icon: PropTypes.string.isRequired 
   })).isRequired,
   onClose: PropTypes.func.isRequired,
   onItemClick: PropTypes.func.isRequired,
