@@ -63,7 +63,7 @@ function Game() {
   const [characterTurn, setCharacterTurn] = useState(0);
   const [showIntroPopup, setShowIntroPopup] = useState(true);
   const [lootFound, setLootFound] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(null);
+  const [selectedItem, setSelectedItem] = useState(null); 
 
   const backgroundAudioRef = useRef(null);
   const combatAudioRef = useRef(null);
@@ -71,31 +71,29 @@ function Game() {
   const eventsEndRef = useRef(null);
   const combatLogsEndRef = useRef(null);
 
-  // Define handleItemClick function
   const handleItemClick = (item) => {
     console.log('Item clicked:', item);
     setSelectedItem(item);
   };
 
-  // Define closeItemPopup function
   const closeItemPopup = () => {
     console.log('Closing item popup');
     setSelectedItem(null);
   };
 
-  // Define handleEquip function
-  const handleEquip = () => {
-    console.log('Equipping item:', selectedItem);
-    // Logic to equip the item (if needed)
-    setSelectedItem(null);
-  };
+  const handleSellItems = (rarity) => {
+    console.log(`Selling all items of rarity: ${rarity}`);
+    setInventory((prevInventory) => {
+      const itemsToSell = prevInventory.filter(item => item.rarity === rarity);
+      const remainingItems = prevInventory.filter(item => item.rarity !== rarity);
+      const totalGold = itemsToSell.reduce((acc, item) => acc + item.price, 0);
 
-  // Define handleSell function
-  const handleSell = () => {
-    console.log('Selling item:', selectedItem);
-    setInventory(prevInventory => prevInventory.filter(item => item !== selectedItem));
-    setGold(prevGold => prevGold + selectedItem.price);
-    setSelectedItem(null);
+      console.log(`Items to sell:`, itemsToSell);
+      console.log(`Gold earned: ${totalGold}`);
+
+      setGold((prevGold) => prevGold + totalGold);
+      return remainingItems;
+    });
   };
 
   useEffect(() => {
@@ -346,7 +344,7 @@ function Game() {
     setCombatLogs(['Combat begins!']);
     backgroundAudioRef.current.pause();
     if (monsterType === 'gorehoof-the-ravager') {
-      bossAudioRef.current.currentTime = 0;
+      bossAudioRef.current.currentTime = 0; 
       bossAudioRef.current.play().catch((error) => {
         console.log('Error playing boss audio:', error);
       });
@@ -376,7 +374,7 @@ function Game() {
     } else {
       handleEvent(setEvents, 'You claimed the reward. There was no loot.', MAX_EVENTS);
     }
-
+  
     setDroppedLoot([]);
     setPopupVisible(false);
     setMonsterEncounter(null);
@@ -390,6 +388,7 @@ function Game() {
       console.log('Error playing background audio:', error);
     });
   };
+  
 
   useEffect(() => {
     if (!lockedChest && !foundDoor && !monsterEncounter && !popupVisible) {
@@ -414,7 +413,7 @@ function Game() {
             setMonsterXP(monster.xp);
             setMonsterGold(monster.gold);
             setMonsterStats(monster.stats);
-            setMonsterHealth(monster.stats.getHp());
+            setMonsterHealth(monster.stats.getHp()); 
             setMonsterEncounter(`You encountered a ${monster.type.charAt(0).toUpperCase() + monster.type.slice(1)}`);
           } else {
             console.error('Monster or monster stats not found:', monster);
@@ -446,7 +445,8 @@ function Game() {
           gold={gold}
           inventory={inventory}
           setShowInventory={setShowInventory}
-          onItemClick={handleItemClick} 
+          onItemClick={handleItemClick}
+          onSellItems={handleSellItems} 
         />
       </div>
       <div className="Stats-container-wrapper">
@@ -517,15 +517,14 @@ function Game() {
         <Inventory
           items={inventory}
           onClose={() => setShowInventory(false)}
-          onItemClick={handleItemClick} 
+          onItemClick={handleItemClick}
+          onSellItems={handleSellItems} 
         />
       )}
       {selectedItem && (
         <ItemPopup
           item={selectedItem}
-          onClose={closeItemPopup} 
-          onEquip={handleEquip} 
-          onSell={handleSell} 
+          onClose={closeItemPopup}
         />
       )}
       {showIntroPopup && (

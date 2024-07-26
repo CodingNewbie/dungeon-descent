@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import '../../styles/game/Inventory.css';
 
@@ -10,8 +10,18 @@ const rarityColors = {
   Legendary: '#FFA500'
 };
 
-const Inventory = ({ items, onClose, onItemClick }) => {
-  console.log('Inventory rendered with onItemClick:', onItemClick);
+const Inventory = ({ items, onClose, onItemClick, onSellItems }) => {
+  const [selectedRarity, setSelectedRarity] = useState('Common');
+
+  const handleRarityChange = (event) => {
+    setSelectedRarity(event.target.value);
+  };
+
+  const handleSell = () => {
+    if (onSellItems) {
+      onSellItems(selectedRarity);
+    }
+  };
 
   return (
     <div className="Inventory">
@@ -21,23 +31,31 @@ const Inventory = ({ items, onClose, onItemClick }) => {
           <h2>Inventory</h2>
           <span className="Inventory-close" onClick={onClose}>&times;</span>
         </div>
+        <div className="Inventory-actions">
+          <button className="Inventory-sell-button" onClick={handleSell}>Sell</button>
+          <select
+            className="Inventory-rarity-dropdown"
+            value={selectedRarity}
+            onChange={handleRarityChange}
+          >
+            {Object.keys(rarityColors).map(rarity => (
+              <option key={rarity} value={rarity} style={{ color: rarityColors[rarity] }}>
+                {rarity}
+              </option>
+            ))}
+          </select>
+        </div>
         <ul>
-          {items.map((item, index) => {
-            console.log('Rendering item:', item);
-            return (
-              <li
-                key={index}
-                style={{ color: rarityColors[item.rarity] }}
-                onClick={() => {
-                  console.log('Item clicked in Inventory:', item);
-                  onItemClick(item);
-                }}
-              >
-                <i className={`ra ${item.icon}`} style={{ color: rarityColors[item.rarity], marginRight: '10px' }}></i>
-                {item.name}
-              </li>
-            );
-          })}
+          {items.map((item, index) => (
+            <li
+              key={index}
+              style={{ color: rarityColors[item.rarity] }}
+              onClick={() => onItemClick(item)}
+            >
+              <i className={`ra ${item.icon}`} style={{ color: rarityColors[item.rarity], marginRight: '10px' }}></i>
+              {item.name}
+            </li>
+          ))}
         </ul>
       </div>
     </div>
@@ -48,10 +66,12 @@ Inventory.propTypes = {
   items: PropTypes.arrayOf(PropTypes.shape({
     name: PropTypes.string.isRequired,
     rarity: PropTypes.string.isRequired,
-    icon: PropTypes.string.isRequired 
+    icon: PropTypes.string.isRequired,
+    price: PropTypes.number.isRequired
   })).isRequired,
   onClose: PropTypes.func.isRequired,
-  onItemClick: PropTypes.func.isRequired
+  onItemClick: PropTypes.func.isRequired,
+  onSellItems: PropTypes.func.isRequired
 };
 
 export default Inventory;
