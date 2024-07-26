@@ -28,7 +28,7 @@ const HeroStatus = ({ name, level, currentXP, requiredXP, gold, inventory, onIte
         <Inventory
           items={inventory}
           onClose={handleCloseInventory}
-          onItemClick={onItemClick} // Pass the onItemClick prop to Inventory
+          onItemClick={onItemClick} 
         />
       )}
     </div>
@@ -42,7 +42,7 @@ HeroStatus.propTypes = {
   requiredXP: PropTypes.number.isRequired,
   gold: PropTypes.number.isRequired,
   inventory: PropTypes.array.isRequired,
-  onItemClick: PropTypes.func.isRequired, // Define the onItemClick prop
+  onItemClick: PropTypes.func.isRequired, 
 };
 
 export default HeroStatus;

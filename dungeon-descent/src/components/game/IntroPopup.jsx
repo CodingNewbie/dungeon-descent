@@ -12,7 +12,7 @@ const rarityColors = {
 
 const ItemPopup = ({ item, onClose }) => {
   if (!item) {
-    return null; // Don't render the popup if the item is not defined
+    return null; 
   }
 
   return (
@@ -41,7 +41,7 @@ ItemPopup.propTypes = {
   item: PropTypes.shape({
     name: PropTypes.string.isRequired,
     rarity: PropTypes.string.isRequired,
-    stats: PropTypes.object // Make sure stats is an object and not required
+    stats: PropTypes.object 
   }),
   onClose: PropTypes.func.isRequired
 };

@@ -27,7 +27,10 @@ const ItemPopup = ({ item, onClose }) => {
       <div className="ItemPopup-overlay" onClick={onClose}></div>
       <div className="ItemPopup-content">
         <div className="ItemPopup-header">
-          <h2 style={{ color: rarityColors[item.rarity] }}>{item.name}</h2>
+          <h2 style={{ color: rarityColors[item.rarity] }}>
+            <i className={`ra ${item.icon}`} style={{ color: rarityColors[item.rarity], marginRight: '10px' }}></i>
+            {item.name}
+          </h2>
           <span className="ItemPopup-close" onClick={onClose}>&times;</span>
         </div>
         <div className="ItemPopup-body">
@@ -50,8 +53,9 @@ ItemPopup.propTypes = {
   item: PropTypes.shape({
     name: PropTypes.string.isRequired,
     rarity: PropTypes.string.isRequired,
-    stats: PropTypes.object
-  }),
+    stats: PropTypes.object,
+    icon: PropTypes.string.isRequired
+  }).isRequired,
   onClose: PropTypes.func.isRequired
 };
 

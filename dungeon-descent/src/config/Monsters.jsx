@@ -92,7 +92,7 @@ const monsters = [
     gold: 75,
     stats: new Stats(400, 45, 25, 0.5, 0, 8, 40),
     lootTable: [
-      { item: 'Rusty Pickaxe', probability: 0.5 },
+      { item: 'Rusty Sword', probability: 0.5 },
       { item: 'Kobold Miner’s Helmet', probability: 0.3 },
       { item: 'Kobold Amulet', probability: 0.15 },
       { item: 'Kobold Gold Nugget', probability: 0.04 },

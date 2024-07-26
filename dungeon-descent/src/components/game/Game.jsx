@@ -8,7 +8,7 @@ import ChestInteraction from './interactions/ChestInteraction';
 import DoorInteraction from './interactions/DoorInteraction';
 import MonsterInteraction from './interactions/MonsterInteraction';
 import Inventory from './Inventory';
-import ItemPopup from './ItemPopup'; // Import ItemPopup
+import ItemPopup from './ItemPopup'; 
 import { handleEvent } from '../../utils/gameUtils';
 import selectMonster from '../../utils/selectMonster';
 import selectLoot from '../../utils/selectLoot';
@@ -63,7 +63,7 @@ function Game() {
   const [characterTurn, setCharacterTurn] = useState(0);
   const [showIntroPopup, setShowIntroPopup] = useState(true);
   const [lootFound, setLootFound] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(null); // Add state for selected item
+  const [selectedItem, setSelectedItem] = useState(null); 
 
   const backgroundAudioRef = useRef(null);
   const combatAudioRef = useRef(null);
@@ -432,7 +432,7 @@ function Game() {
           gold={gold}
           inventory={inventory}
           setShowInventory={setShowInventory}
-          onItemClick={handleItemClick} // Ensure this is passed correctly
+          onItemClick={handleItemClick} 
         />
       </div>
       <div className="Stats-container-wrapper">
@@ -503,13 +503,13 @@ function Game() {
         <Inventory
           items={inventory}
           onClose={() => setShowInventory(false)}
-          onItemClick={handleItemClick} // Ensure this is passed correctly
+          onItemClick={handleItemClick} 
         />
       )}
       {selectedItem && (
         <ItemPopup
           item={selectedItem}
-          onClose={closeItemPopup} // Ensure this is passed correctly
+          onClose={closeItemPopup} 
         />
       )}
       {showIntroPopup && (

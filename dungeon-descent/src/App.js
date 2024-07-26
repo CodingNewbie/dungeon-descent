@@ -5,6 +5,7 @@ import Game from './components/game/Game';
 import './styles/game/App.css';
 import './styles/landing/LandingPage.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import 'rpg-awesome/css/rpg-awesome.min.css';
 
 function App() {
   return (

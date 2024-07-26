@@ -22,18 +22,22 @@ const Inventory = ({ items, onClose, onItemClick }) => {
           <span className="Inventory-close" onClick={onClose}>&times;</span>
         </div>
         <ul>
-          {items.map((item, index) => (
-            <li
-              key={index}
-              style={{ color: rarityColors[item.rarity] }}
-              onClick={() => {
-                console.log('Item clicked in Inventory:', item);
-                onItemClick(item);
-              }}
-            >
-              {item.name}
-            </li>
-          ))}
+          {items.map((item, index) => {
+            console.log('Rendering item:', item);
+            return (
+              <li
+                key={index}
+                style={{ color: rarityColors[item.rarity] }}
+                onClick={() => {
+                  console.log('Item clicked in Inventory:', item);
+                  onItemClick(item);
+                }}
+              >
+                <i className={`ra ${item.icon}`} style={{ color: rarityColors[item.rarity], marginRight: '10px' }}></i>
+                {item.name}
+              </li>
+            );
+          })}
         </ul>
       </div>
     </div>
@@ -43,10 +47,11 @@ const Inventory = ({ items, onClose, onItemClick }) => {
 Inventory.propTypes = {
   items: PropTypes.arrayOf(PropTypes.shape({
     name: PropTypes.string.isRequired,
-    rarity: PropTypes.string.isRequired
+    rarity: PropTypes.string.isRequired,
+    icon: PropTypes.string.isRequired 
   })).isRequired,
   onClose: PropTypes.func.isRequired,
-  onItemClick: PropTypes.func.isRequired // Define the new prop
+  onItemClick: PropTypes.func.isRequired
 };
 
 export default Inventory;
