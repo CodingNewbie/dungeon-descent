@@ -97,4 +97,4 @@ class Floor {
   }
 }
 
-export { Floor };
+export default Floor;

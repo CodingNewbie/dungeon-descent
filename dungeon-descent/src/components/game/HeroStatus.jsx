@@ -3,9 +3,7 @@ import PropTypes from 'prop-types';
 import Inventory from './Inventory';
 import '../../styles/game/HeroStatus.css';
 
-
-
-const HeroStatus = ({ name, level, currentXP, requiredXP, gold, inventory }) => {
+const HeroStatus = ({ name, level, currentXP, requiredXP, gold, inventory, onItemClick }) => {
   const [showInventory, setShowInventory] = useState(false);
   const xpPercentage = (currentXP / requiredXP) * 100;
 
@@ -26,7 +24,13 @@ const HeroStatus = ({ name, level, currentXP, requiredXP, gold, inventory }) => 
       </div>
       <p><i className="fa-solid fa-coins" style={{ color: '#FFD43B' }}></i> {gold}</p>
       <button onClick={handleInventoryClick}>Inventory</button>
-      {showInventory && <Inventory items={inventory} onClose={handleCloseInventory} />}
+      {showInventory && (
+        <Inventory
+          items={inventory}
+          onClose={handleCloseInventory}
+          onItemClick={onItemClick} // Pass the onItemClick prop to Inventory
+        />
+      )}
     </div>
   );
 };
@@ -38,6 +42,7 @@ HeroStatus.propTypes = {
   requiredXP: PropTypes.number.isRequired,
   gold: PropTypes.number.isRequired,
   inventory: PropTypes.array.isRequired,
+  onItemClick: PropTypes.func.isRequired, // Define the onItemClick prop
 };
 
 export default HeroStatus;

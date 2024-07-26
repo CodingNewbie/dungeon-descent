@@ -1,22 +1,35 @@
-import React from 'react';
-
 class Stats {
-  constructor() {
-    this.hp = 1000;
-    this.atk = 50;
-    this.def = 50;
-    this.atkSpd = 0.5;
-    this.vamp = 0;
-    this.cRate = 0;
-    this.cDmg = 0;
+  constructor({
+    hp = 0,
+    atk = 0,
+    def = 0,
+    atkSpd = 0,
+    vamp = 0,
+    cRate = 0,
+    cDmg = 0,
+    bonusHp = 0,
+    bonusAtk = 0,
+    bonusDef = 0,
+    bonusAtkSpd = 0,
+    bonusVamp = 0,
+    bonusCRate = 0,
+    bonusCDmg = 0
+  } = {}) {
+    this.hp = hp;
+    this.atk = atk;
+    this.def = def;
+    this.atkSpd = atkSpd;
+    this.vamp = vamp;
+    this.cRate = cRate;
+    this.cDmg = cDmg;
 
-    this.bonusHp = 0;
-    this.bonusAtk = 0;
-    this.bonusDef = 0;
-    this.bonusAtkSpd = 0;
-    this.bonusVamp = 0;
-    this.bonusCRate = 0;
-    this.bonusCDmg = 0;
+    this.bonusHp = bonusHp;
+    this.bonusAtk = bonusAtk;
+    this.bonusDef = bonusDef;
+    this.bonusAtkSpd = bonusAtkSpd;
+    this.bonusVamp = bonusVamp;
+    this.bonusCRate = bonusCRate;
+    this.bonusCDmg = bonusCDmg;
   }
 
   getHp() {
@@ -73,62 +86,6 @@ class Stats {
 
   getBonusCDmg() {
     return this.bonusCDmg;
-  }
-
-  setHp(value) {
-    this.hp = value;
-  }
-
-  setAtk(value) {
-    this.atk = value;
-  }
-
-  setDef(value) {
-    this.def = value;
-  }
-
-  setAtkSpd(value) {
-    this.atkSpd = value;
-  }
-
-  setVamp(value) {
-    this.vamp = value;
-  }
-
-  setCRate(value) {
-    this.cRate = value;
-  }
-
-  setCDmg(value) {
-    this.cDmg = value;
-  }
-
-  setBonusHp(value) {
-    this.bonusHp = value;
-  }
-
-  setBonusAtk(value) {
-    this.bonusAtk = value;
-  }
-
-  setBonusDef(value) {
-    this.bonusDef = value;
-  }
-
-  setBonusAtkSpd(value) {
-    this.bonusAtkSpd = value;
-  }
-
-  setBonusVamp(value) {
-    this.bonusVamp = value;
-  }
-
-  setBonusCRate(value) {
-    this.bonusCRate = value;
-  }
-
-  setBonusCDmg(value) {
-    this.bonusCDmg = value;
   }
 }
 

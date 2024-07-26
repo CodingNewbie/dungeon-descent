@@ -1,12 +1,12 @@
 import { Stats } from './Stats';
 
 class Character {
-  constructor() {
-    this.name = "";
-    this.stats = new Stats();
+  constructor(name) {
+    this.name = name;
+    this.stats = new Stats({ hp: 1000, atk: 10, def: 5, atkSpd: 0.1 });
   }
 
-  set_name(name) {
+  setName(name) {
     this.name = name;
   }
 
@@ -16,11 +16,7 @@ class Character {
 }
 
 function createCharacter(name) {
-  const character = new Character();
-  character.set_name(name);
-  return character;
+  return new Character(name);
 }
-
-const character = new Character();
 
 export { Character, createCharacter };

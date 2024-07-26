@@ -6,7 +6,7 @@ import HeroInfo from './HeroInfo';
 import CombatEventContainer from './CombatEventContainer';
 import '../../styles/game/EncounterPopup.css';
 
-function EncounterPopup({ monster, hero, combatLogs, onClaimReward, monsterHealth, monsterStatus, monsterType, monsterAnimation, isMonsterHit }) {
+function EncounterPopup({ monster, hero, combatLogs, onClaimReward, monsterHealth, monsterStatus, monsterType, monsterAnimation, isMonsterHit, lootFound }) {
   return (
     <div>
       <div className="EncounterPopup-overlay" onClick={onClaimReward}></div>
@@ -20,7 +20,8 @@ function EncounterPopup({ monster, hero, combatLogs, onClaimReward, monsterHealt
           <CombatEventContainer
             combatLogs={combatLogs}
             onClaimReward={onClaimReward}
-            monsterDefeated={monster.currentHealth === 0}
+            monsterDefeated={monster.currentHealth <= 0}
+            lootFound={lootFound}  
           />
         </div>
       </div>

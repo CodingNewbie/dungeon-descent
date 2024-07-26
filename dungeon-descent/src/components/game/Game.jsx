@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef, useCallback} from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createCharacter } from './Character';
-import { Floor } from './Floor';
+import Floor from './Floor';
 import { Stats, StatsDisplay, BonusStatsDisplay } from './Stats';
 import EncounterPopup from './EncounterPopup';
 import HeroStatus from './HeroStatus';
@@ -8,6 +8,7 @@ import ChestInteraction from './interactions/ChestInteraction';
 import DoorInteraction from './interactions/DoorInteraction';
 import MonsterInteraction from './interactions/MonsterInteraction';
 import Inventory from './Inventory';
+import ItemPopup from './ItemPopup'; // Import ItemPopup
 import { handleEvent } from '../../utils/gameUtils';
 import selectMonster from '../../utils/selectMonster';
 import selectLoot from '../../utils/selectLoot';
@@ -61,12 +62,26 @@ function Game() {
   const [droppedLoot, setDroppedLoot] = useState([]);
   const [characterTurn, setCharacterTurn] = useState(0);
   const [showIntroPopup, setShowIntroPopup] = useState(true);
+  const [lootFound, setLootFound] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null); // Add state for selected item
 
   const backgroundAudioRef = useRef(null);
   const combatAudioRef = useRef(null);
   const bossAudioRef = useRef(null);
   const eventsEndRef = useRef(null);
   const combatLogsEndRef = useRef(null);
+
+  // Define handleItemClick function
+  const handleItemClick = (item) => {
+    console.log('Item clicked:', item);
+    setSelectedItem(item);
+  };
+
+  // Define closeItemPopup function
+  const closeItemPopup = () => {
+    console.log('Closing item popup');
+    setSelectedItem(null);
+  };
 
   useEffect(() => {
     if (eventsEndRef.current) {
@@ -83,11 +98,6 @@ function Game() {
   useEffect(() => {
     setHeroHealth(character.getHp());
   }, [character]);
-
-  const handleCreateCharacter = () => {
-    const newCharacter = createCharacter('Bob');
-    setCharacter(newCharacter);
-  };
 
   const handleChestOpen = () => {
     const roll = Math.random();
@@ -119,7 +129,7 @@ function Game() {
     setPopupVisible(true);
     handleCombatPhase(selectedMonster.type);
   }, []);
-  
+
   const resetChestState = () => {
     setLockedChest(false);
     setChestInteraction(null);
@@ -146,7 +156,7 @@ function Game() {
     const randomIndex = Math.floor(Math.random() * bosses.length);
     return bosses[randomIndex];
   };
-  
+
   const handleBossRoom = () => {
     const bossMonster = getRandomBoss();
     if (bossMonster) {
@@ -169,7 +179,7 @@ function Game() {
   };
 
   const handleEngage = () => {
-    setMonsterHealth(monsterStats.getHp()); 
+    setMonsterHealth(monsterStats.getHp());
     setMonsterStatus('alive');
     setMonsterAnimation('idle');
     setCombatLogs([]);
@@ -231,7 +241,6 @@ function Game() {
     console.log('Current Monster:', currentMonster);
     return currentMonster;
   };
-  
 
   const handleLoot = (currentMonster) => {
     if (currentMonster) {
@@ -240,7 +249,13 @@ function Game() {
       if (loot.length > 0) {
         setCombatLogs((prevLogs) => [
           ...prevLogs,
-          `You found: <span style="color: ${rarityColors[loot[0].rarity]}">${loot[0].item}</span>.`
+          `You found: <span style="color: ${rarityColors[loot[0].rarity]}">${loot[0].name}</span>.`
+        ]);
+        setLootFound(true);
+      } else {
+        setCombatLogs((prevLogs) => [
+          ...prevLogs,
+          `No loot found.`
         ]);
       }
     } else {
@@ -259,20 +274,25 @@ function Game() {
 
   const handleMonsterDefeat = () => {
     console.log(`${monsterType} defeated. Gold dropped: ${monsterGold}`);
-    setCombatLogs((prevLogs) => [...prevLogs, `${monsterType} dropped ${monsterGold} gold.`]);
+    setCombatLogs((prevLogs) => [
+      ...prevLogs,
+      `${monsterType} dropped ${monsterGold} gold.`
+    ]);
     setMonsterStatus('dead');
     setGold(prevGold => prevGold + monsterGold);
     updateHeroXP();
-  
+
     const currentMonster = findCurrentMonster();
     handleLoot(currentMonster);
+
     setCharacterTurn(0);
-  
-    if (currentMonster && currentMonster.isBoss) {
+    const bossMonster = monsters.find(monster => monster.isBoss && monster.type === monsterType);
+
+    if (bossMonster) {
       handleBossDefeat();
     }
   };
-  
+
   const handleMonsterTurn = () => {
     console.log("Monster move");
     setMonsterAnimation('attack');
@@ -311,12 +331,12 @@ function Game() {
     setCombatLogs(['Combat begins!']);
     backgroundAudioRef.current.pause();
     if (monsterType === 'gorehoof-the-ravager') {
-      bossAudioRef.current.currentTime = 0; // Reset boss audio to the start
+      bossAudioRef.current.currentTime = 0; 
       bossAudioRef.current.play().catch((error) => {
         console.log('Error playing boss audio:', error);
       });
     } else {
-      combatAudioRef.current.currentTime = 0; // Reset combat audio to the start
+      combatAudioRef.current.currentTime = 0;
       combatAudioRef.current.play().catch((error) => {
         console.log('Error playing combat audio:', error);
       });
@@ -326,16 +346,22 @@ function Game() {
 
   const handleClaimReward = () => {
     if (droppedLoot.length > 0) {
-      setInventory((prevInventory) => [...prevInventory, ...droppedLoot]);
+      console.log("Previous Inventory:", inventory);
+      console.log("Dropped Loot:", droppedLoot);
+      setInventory((prevInventory) => {
+        const newInventory = [...prevInventory, ...droppedLoot];
+        console.log("Updated Inventory:", newInventory);
+        return newInventory;
+      });
       handleEvent(setEvents, (
         <>
-          You claimed: <span style={{ color: rarityColors[droppedLoot[0].rarity] }}>{droppedLoot[0].item}</span>.
+          You claimed: <span style={{ color: rarityColors[droppedLoot[0].rarity] }}>{droppedLoot[0].name}</span>.
         </>
       ), MAX_EVENTS);
     } else {
       handleEvent(setEvents, 'You claimed the reward. There was no loot.', MAX_EVENTS);
     }
-
+  
     setDroppedLoot([]);
     setPopupVisible(false);
     setMonsterEncounter(null);
@@ -349,12 +375,13 @@ function Game() {
       console.log('Error playing background audio:', error);
     });
   };
+  
 
   useEffect(() => {
     if (!lockedChest && !foundDoor && !monsterEncounter && !popupVisible) {
       const interval = setInterval(() => {
         const encounterMessage = floor.getEncounter();
-        console.log("Encounter message:", encounterMessage); 
+        console.log("Encounter message:", encounterMessage);
         if (encounterMessage === 'You found a locked chest.') {
           setLockedChest(true);
           setChestInteraction(encounterMessage);
@@ -367,13 +394,13 @@ function Game() {
           setIsBossRoom(true);
         } else if (encounterMessage.startsWith('You encountered a')) {
           const monster = selectMonster();
-          console.log('Selected Monster:', monster); 
+          console.log('Selected Monster:', monster);
           if (monster && monster.stats) {
             setMonsterType(monster.type);
             setMonsterXP(monster.xp);
             setMonsterGold(monster.gold);
-            setMonsterStats(monster.stats); 
-            setMonsterHealth(monster.stats.getHp()); // Initialize health from stats
+            setMonsterStats(monster.stats);
+            setMonsterHealth(monster.stats.getHp()); 
             setMonsterEncounter(`You encountered a ${monster.type.charAt(0).toUpperCase() + monster.type.slice(1)}`);
           } else {
             console.error('Monster or monster stats not found:', monster);
@@ -386,12 +413,11 @@ function Game() {
           handleEvent(setEvents, encounterMessage, MAX_EVENTS);
         }
       }, 100);
-  
+
       return () => clearInterval(interval);
     }
   }, [floor, lockedChest, foundDoor, monsterEncounter, popupVisible]);
-  
-      
+
   return (
     <div className="Game">
       <header className="App-header">
@@ -406,6 +432,7 @@ function Game() {
           gold={gold}
           inventory={inventory}
           setShowInventory={setShowInventory}
+          onItemClick={handleItemClick} // Ensure this is passed correctly
         />
       </div>
       <div className="Stats-container-wrapper">
@@ -469,12 +496,20 @@ function Game() {
           monsterType={monsterType}
           monsterAnimation={monsterAnimation}
           isMonsterHit={isMonsterHit}
+          lootFound={lootFound}
         />
       )}
       {showInventory && (
         <Inventory
           items={inventory}
           onClose={() => setShowInventory(false)}
+          onItemClick={handleItemClick} // Ensure this is passed correctly
+        />
+      )}
+      {selectedItem && (
+        <ItemPopup
+          item={selectedItem}
+          onClose={closeItemPopup} // Ensure this is passed correctly
         />
       )}
       {showIntroPopup && (
