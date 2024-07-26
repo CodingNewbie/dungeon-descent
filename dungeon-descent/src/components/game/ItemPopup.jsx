@@ -15,9 +15,9 @@ const formatStat = (stat) => {
   return `${formattedStat}+`;
 };
 
-const ItemPopup = ({ item, onClose }) => {
+const ItemPopup = ({ item, onClose, onEquip, onSell }) => {
   if (!item) {
-    return null; 
+    return null;
   }
 
   const stats = item.stats ? Object.entries(item.stats.getStats ? item.stats.getStats() : item.stats) : [];
@@ -31,7 +31,6 @@ const ItemPopup = ({ item, onClose }) => {
             <i className={`ra ${item.icon}`} style={{ color: rarityColors[item.rarity], marginRight: '10px' }}></i>
             {item.name}
           </h2>
-          <span className="ItemPopup-close" onClick={onClose}>&times;</span>
         </div>
         <div className="ItemPopup-body">
           <ul>
@@ -44,6 +43,13 @@ const ItemPopup = ({ item, onClose }) => {
             )}
           </ul>
         </div>
+        <div className="ItemPopup-footer">
+          <button onClick={onEquip}>Equip</button>
+          <button onClick={onSell}>
+            <i className="fa-solid fa-coins" style={{ color: '#FFD43B' }}></i> {item.price}
+          </button>
+          <button onClick={onClose}>Close</button>
+        </div>
       </div>
     </div>
   );
@@ -54,9 +60,12 @@ ItemPopup.propTypes = {
     name: PropTypes.string.isRequired,
     rarity: PropTypes.string.isRequired,
     stats: PropTypes.object,
-    icon: PropTypes.string.isRequired
+    icon: PropTypes.string.isRequired,
+    price: PropTypes.number.isRequired
   }).isRequired,
-  onClose: PropTypes.func.isRequired
+  onClose: PropTypes.func.isRequired,
+  onEquip: PropTypes.func.isRequired,
+  onSell: PropTypes.func.isRequired,
 };
 
 export default ItemPopup;

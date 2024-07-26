@@ -22,7 +22,6 @@
   
   .ItemPopup-content {
     position: relative;
-    width: 300px; 
     background: black; 
     color: white; 
     border: 1px solid white; 
@@ -35,12 +34,6 @@
     display: flex;
     justify-content: space-between;
     margin-bottom: 10px;
-  }
-  
-  .ItemPopup-close {
-    cursor: pointer;
-    font-size: 24px;
-    color: white;
   }
   
   .ItemPopup-body ul {
@@ -61,5 +54,25 @@
   
   .ItemPopup h2 {
     margin: 0;
+  }
+  
+  .ItemPopup-footer {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  
+  .ItemPopup-footer button {
+    background: none;
+    border: 1px solid white;
+    color: white;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 3px;
+  }
+  
+  .ItemPopup-footer button:hover {
+    background: rgba(255, 255, 255, 0.1);
   }
   

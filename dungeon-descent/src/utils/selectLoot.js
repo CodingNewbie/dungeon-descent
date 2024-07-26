@@ -20,7 +20,7 @@ const selectLoot = (lootTable) => {
           return acc;
         }, {});
         
-        return [{ name: item.name, rarity: item.rarity, stats: filteredStats, icon: item.icon, type: item.type }];
+        return [{ name: item.name, rarity: item.rarity, stats: filteredStats, icon: item.icon, type: item.type, price: item.price }];
       } else {
         return [];
       }
