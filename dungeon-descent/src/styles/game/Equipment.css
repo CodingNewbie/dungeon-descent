@@ -1,0 +1,55 @@
+.Equipment {
+    margin-top: 20px; 
+    border: 1px solid white;
+    padding: 10px;
+    border-radius: 5px;
+    background: black;
+}
+
+.Equipment h2 {
+    margin: 0;
+    margin-bottom: 10px;
+    color: white;
+    font-size: 15px;
+}
+
+.Equipment-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 10px;
+}
+
+.Equipment-slot {
+    width: 62px;
+    height: 33px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid white;
+    border-radius: 5px;
+    background: black;
+    transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+    cursor: pointer;
+    color: inherit;
+}
+
+.Equipment-slot i {
+    font-size: 24px;
+    transition: color 0.1s;
+    color: inherit;
+}
+
+.Equipment-slot.empty-slot {
+    color: gray;
+    font-size: 24px;
+}
+
+.Equipment-slot:hover {
+    background-color: white !important;
+    border-color: white !important;
+    color: black !important; 
+}
+
+.Equipment-slot:hover i {
+    color: black !important; 
+}

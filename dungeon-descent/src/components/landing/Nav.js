@@ -1,23 +1,10 @@
-import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
-import styled from "styled-components";
+import React, { useState } from 'react';
+import '../../styles/landing/Nav.css';
 
-const NavContainer = styled.nav`
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background-image: url('path_to_your_image.jpg'); /* Replace with your image path */
-    background-attachment: fixed;
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
-    padding: 1rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-`;
+const Nav = () => {
+    const [isOpen, setIsOpen] = useState(false);
 
-const NavContent = styled.div`
+    const NavContent = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -26,7 +13,7 @@ const NavContent = styled.div`
     padding: 0 1rem;
 `;
 
-const Logo = styled.div`
+    const Logo = styled.div`
     font-size: 1.5rem;
     font-weight: bold;
     font-family: 'Tiny5';
@@ -34,12 +21,12 @@ const Logo = styled.div`
     padding: 20px;
 `;
 
-const NavLinks = styled.div`
+    const NavLinks = styled.div`
     display: flex;
     gap: 1rem;
 `;
 
-const NavLink = styled(Link)`
+    const NavLink = styled(Link)`
     text-decoration: none;
     padding: 0.5rem 1rem;
     border-radius: 25px;
@@ -70,7 +57,7 @@ const NavLink = styled(Link)`
     &:hover::before {
         transform: scaleX(1); /* Display on hover */
     }
-`;
+`};
 
 function Nav() {
     useEffect(() => {
@@ -83,22 +70,27 @@ function Nav() {
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
+    const toggleDropdown = () => {
+        setIsOpen(!isOpen);
+    };
 
     return (
-        <NavContainer className="nav">
-            <NavContent>
-                <Logo>DD</Logo>
-                <NavLinks>
-                    <NavLink to="/game-info">Game info ▼</NavLink>
-                    <NavLink to="/token">Token</NavLink>
-                    <NavLink to="/about">About</NavLink>
-                </NavLinks>
-                <div className="nav-buttons">
-                    {/* Additional buttons or links can be added here */}
+        <nav className="nav">
+            <div className="nav-content">
+                <div className="dropdown">
+                    <button className="dropbtn" onClick={toggleDropdown}>
+                        Menu
+                    </button>
+                    {isOpen && (
+                        <div className="dropdown-content">
+                            <a href="#home">Home</a>
+                            <a href="#tokens">Tokens</a>
+                        </div>
+                    )}
                 </div>
-            </NavContent>
-        </NavContainer>
+            </div>
+        </nav>
     );
-}
+};
 
 export default Nav;

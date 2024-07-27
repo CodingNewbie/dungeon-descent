@@ -1,7 +1,7 @@
 .footer {
     background-color: #1a1a1a;
     color: white;
-    padding: 2rem 0;
+    padding: .4rem 0;
     width: 100%;
     margin-top: auto;
     z-index: 1000;
@@ -14,6 +14,7 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 1rem;
+    font-family: "Pixelify Sans", sans-serif;
 }
 
 .footer-section {
@@ -22,9 +23,10 @@
 }
 
 .footer-section h3 {
+    font-family: "Tiny5", sans-serif;
     font-size: 1.2rem;
     margin-bottom: 1rem;
-    color: #6a11cb;
+    color: wheat
 }
 
 .footer-link {
@@ -36,14 +38,15 @@
 }
 
 .footer-link:hover {
-    color: #6a11cb;
+    color: red;
 }
 
 .copyright {
     text-align: center;
-    margin-top: .5rem;
-    padding-top: .5rem;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
     border-top: 1px solid #333;
+    font-family: "Pixelify Sans", sans-serif;
 }
 
 @media (max-width: 768px) {

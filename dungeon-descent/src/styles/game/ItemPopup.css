@@ -1,0 +1,79 @@
+.ItemPopup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1001; 
+  }
+  
+  .ItemPopup-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 1000; 
+  }
+  
+  .ItemPopup-content {
+    position: relative;
+    background: black; 
+    color: white; 
+    border: 1px solid white; 
+    padding: 10px; 
+    border-radius: 5px;
+    z-index: 1001; 
+  }
+  
+  .ItemPopup-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  
+  .ItemPopup-body ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+  }
+  
+  .ItemPopup-body li {
+    width: 100%;
+    cursor: default;
+  }
+  
+  .ItemPopup-body li:hover {
+    background-color: transparent; 
+  }
+  
+  .ItemPopup h2 {
+    margin: 0;
+  }
+  
+  .ItemPopup-footer {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  
+  .ItemPopup-footer button {
+    background: none;
+    border: 1px solid white;
+    color: white;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 3px;
+  }
+  
+  .ItemPopup-footer button:hover {
+    background: white;
+    color: black;
+  }
+  
