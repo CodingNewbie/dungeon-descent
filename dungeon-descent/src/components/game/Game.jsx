@@ -33,7 +33,22 @@ function Game() {
   const [events, setEvents] = useState([]);
   const [character, setCharacter] = useState(createCharacter('Khor'));
   const [floor, setFloor] = useState(new Floor());
-  const [stats] = useState(new Stats());
+  const [heroStats, setHeroStats] = useState(new Stats({
+    hp: 10000,
+    atk: 20,
+    def: 10,
+    atkSpd: 1.5,
+    vamp: 5,
+    cRate: 10,
+    cDmg: 15,
+    bonusHp: 0,
+    bonusAtk: 0,
+    bonusDef: 0,
+    bonusAtkSpd: 0,
+    bonusVamp: 0,
+    bonusCRate: 0,
+    bonusCDmg: 0
+  }));
   const [lockedChest, setLockedChest] = useState(false);
   const [chestInteraction, setChestInteraction] = useState(null);
   const [foundDoor, setFoundDoor] = useState(false);
@@ -44,7 +59,7 @@ function Game() {
   const [monsterEncounter, setMonsterEncounter] = useState(null);
   const [popupVisible, setPopupVisible] = useState(false);
   const [combatLogs, setCombatLogs] = useState([]);
-  const [heroHealth, setHeroHealth] = useState(character.getHp());
+  const [heroHealth, setHeroHealth] = useState(heroStats.getHp());
   const [monsterHealth, setMonsterHealth] = useState(0);
   const [monsterStats, setMonsterStats] = useState(new Stats());
   const [monsterStatus, setMonsterStatus] = useState('alive');
@@ -115,6 +130,14 @@ function Game() {
       });
 
       setInventory(prevInventory => prevInventory.filter(invItem => invItem !== item));
+      setHeroStats(prevStats => {
+        const newStats = { ...prevStats };
+        const itemStats = item.stats;
+        Object.keys(itemStats).forEach(stat => {
+          newStats[`bonus${stat.charAt(0).toUpperCase() + stat.slice(1)}`] += itemStats[stat];
+        });
+        return new Stats(newStats);
+      });
       setSelectedItem(null);
     } else {
       console.log('No empty slot available to equip the item.');
@@ -130,6 +153,14 @@ function Game() {
     });
 
     setInventory(prevInventory => [...prevInventory, item]);
+    setHeroStats(prevStats => {
+      const newStats = { ...prevStats };
+      const itemStats = item.stats;
+      Object.keys(itemStats).forEach(stat => {
+        newStats[`bonus${stat.charAt(0).toUpperCase() + stat.slice(1)}`] -= itemStats[stat];
+      });
+      return new Stats(newStats);
+    });
     setSelectedItem(null);
   };
 
@@ -146,8 +177,8 @@ function Game() {
   }, [combatLogs, popupVisible]);
 
   useEffect(() => {
-    setHeroHealth(character.getHp());
-  }, [character]);
+    setHeroHealth(heroStats.getHp());
+  }, [heroStats]);
 
   const handleChestOpen = () => {
     const roll = Math.random();
@@ -415,7 +446,7 @@ function Game() {
     setDroppedLoot([]);
     setPopupVisible(false);
     setMonsterEncounter(null);
-    setHeroHealth(character.getHp());
+    setHeroHealth(heroStats.getHp());
     setMonsterHealth(monsterStats.getHp());
     setMonsterStatus('alive');
     setMonsterAnimation('idle');
@@ -487,8 +518,8 @@ function Game() {
         />
       </div>
       <div className="Stats-container-wrapper">
-        <StatsDisplay stats={stats} />
-        <BonusStatsDisplay stats={stats} />
+        <StatsDisplay stats={heroStats} />
+        <BonusStatsDisplay stats={heroStats} />
       </div>
       <div className="Info-container">
         <p>Floor: {currentFloor}</p>
@@ -538,7 +569,7 @@ function Game() {
             name: character.name,
             level: heroLevel,
             currentHealth: heroHealth,
-            totalHealth: character.getHp(),
+            totalHealth: heroStats.getHp(),
           }}
           combatLogs={combatLogs}
           onClaimReward={handleClaimReward}

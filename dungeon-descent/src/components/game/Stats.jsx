@@ -32,6 +32,25 @@ class Stats {
     this.bonusCDmg = bonusCDmg;
   }
 
+  getStats() {
+    return {
+      hp: this.hp,
+      atk: this.atk,
+      def: this.def,
+      atkSpd: this.atkSpd,
+      vamp: this.vamp,
+      cRate: this.cRate,
+      cDmg: this.cDmg,
+      bonusHp: this.bonusHp,
+      bonusAtk: this.bonusAtk,
+      bonusDef: this.bonusDef,
+      bonusAtkSpd: this.bonusAtkSpd,
+      bonusVamp: this.bonusVamp,
+      bonusCRate: this.bonusCRate,
+      bonusCDmg: this.bonusCDmg
+    };
+  }
+
   getHp() {
     return this.hp;
   }
@@ -89,30 +108,36 @@ class Stats {
   }
 }
 
-const StatsDisplay = ({ stats }) => (
-  <div className="Stats-container">
-    <p><strong>Stats</strong></p>
-    <p>HP: {stats.getHp()}</p>
-    <p>ATK: {stats.getAtk()}</p>
-    <p>DEF: {stats.getDef()}</p>
-    <p>ATK.SPD: {stats.getAtkSpd()}</p>
-    <p>VAMP: {stats.getVamp()}%</p>
-    <p>C.RATE: {stats.getCRate()}%</p>
-    <p>C.DMG: {stats.getCDmg()}%</p>
-  </div>
-);
+const StatsDisplay = ({ stats }) => {
+  const { hp, atk, def, atkSpd, vamp, cRate, cDmg } = stats.getStats();
+  return (
+    <div className="Stats-container">
+      <p><strong>Stats</strong></p>
+      <p>HP: {hp}</p>
+      <p>ATK: {atk}</p>
+      <p>DEF: {def}</p>
+      <p>ATK.SPD: {atkSpd}</p>
+      <p>VAMP: {vamp}%</p>
+      <p>C.RATE: {cRate}%</p>
+      <p>C.DMG: {cDmg}%</p>
+    </div>
+  );
+};
 
-const BonusStatsDisplay = ({ stats }) => (
-  <div className="BonusStats-container">
-    <p><strong>Bonus Stats</strong></p>
-    <p>Bonus HP: {stats.getBonusHp()}</p>
-    <p>Bonus ATK: {stats.getBonusAtk()}</p>
-    <p>Bonus DEF: {stats.getBonusDef()}</p>
-    <p>Bonus ATK.SPD: {stats.getBonusAtkSpd()}%</p>
-    <p>Bonus VAMP: {stats.getBonusVamp()}%</p>
-    <p>Bonus C.RATE: {stats.getBonusCRate()}%</p>
-    <p>Bonus C.DMG: {stats.getBonusCDmg()}%</p>
-  </div>
-);
+const BonusStatsDisplay = ({ stats }) => {
+  const { bonusHp, bonusAtk, bonusDef, bonusAtkSpd, bonusVamp, bonusCRate, bonusCDmg } = stats.getStats();
+  return (
+    <div className="BonusStats-container">
+      <p><strong>Bonus Stats</strong></p>
+      <p>Bonus HP: {bonusHp}</p>
+      <p>Bonus ATK: {bonusAtk}</p>
+      <p>Bonus DEF: {bonusDef}</p>
+      <p>Bonus ATK.SPD: {bonusAtkSpd}%</p>
+      <p>Bonus VAMP: {bonusVamp}%</p>
+      <p>Bonus C.RATE: {bonusCRate}%</p>
+      <p>Bonus C.DMG: {bonusCDmg}%</p>
+    </div>
+  );
+};
 
 export { Stats, StatsDisplay, BonusStatsDisplay };
