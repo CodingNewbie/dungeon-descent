@@ -64,6 +64,7 @@ function Game() {
   const [showIntroPopup, setShowIntroPopup] = useState(true);
   const [lootFound, setLootFound] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null); 
+  const [equipment, setEquipment] = useState(new Array(6).fill(null)); 
 
   const backgroundAudioRef = useRef(null);
   const combatAudioRef = useRef(null);
@@ -81,19 +82,54 @@ function Game() {
     setSelectedItem(null);
   };
 
-  const handleSellItems = (rarity) => {
-    console.log(`Selling all items of rarity: ${rarity}`);
-    setInventory((prevInventory) => {
-      const itemsToSell = prevInventory.filter(item => item.rarity === rarity);
-      const remainingItems = prevInventory.filter(item => item.rarity !== rarity);
+  const handleSellItems = (rarityOrItem) => {
+    if (typeof rarityOrItem === 'string') {
+      const itemsToSell = inventory.filter(item => item.rarity === rarityOrItem);
       const totalGold = itemsToSell.reduce((acc, item) => acc + item.price, 0);
+      setGold(prevGold => prevGold + totalGold);
+      setInventory(prevInventory => prevInventory.filter(item => item.rarity !== rarityOrItem));
+      setEvents(prevEvents => [
+        ...prevEvents,
+        `Sold ${itemsToSell.length} ${rarityOrItem} items for ${totalGold} gold.`
+      ]);
+    } else {
+      setGold(prevGold => prevGold + rarityOrItem.price);
+      setInventory(prevInventory => prevInventory.filter(item => item !== rarityOrItem));
+      setEvents(prevEvents => [
+        ...prevEvents,
+        `Sold ${rarityOrItem.name} for ${rarityOrItem.price} gold.`
+      ]);
+    }
+  };
 
-      console.log(`Items to sell:`, itemsToSell);
-      console.log(`Gold earned: ${totalGold}`);
+  const handleEquipItem = (item) => {
+    console.log('Equipping item:', item);
 
-      setGold((prevGold) => prevGold + totalGold);
-      return remainingItems;
+    const firstEmptySlot = equipment.findIndex(slot => slot === null);
+    if (firstEmptySlot !== -1) {
+      setEquipment(prevEquipment => {
+        const newEquipment = [...prevEquipment];
+        newEquipment[firstEmptySlot] = item;
+        return newEquipment;
+      });
+
+      setInventory(prevInventory => prevInventory.filter(invItem => invItem !== item));
+      setSelectedItem(null);
+    } else {
+      console.log('No empty slot available to equip the item.');
+    }
+  };
+
+  const handleUnequipItem = (item) => {
+    console.log('Unequipping item:', item);
+
+    setEquipment(prevEquipment => {
+      const newEquipment = prevEquipment.map(slot => (slot === item ? null : slot));
+      return newEquipment;
     });
+
+    setInventory(prevInventory => [...prevInventory, item]);
+    setSelectedItem(null);
   };
 
   useEffect(() => {
@@ -446,7 +482,8 @@ function Game() {
           inventory={inventory}
           setShowInventory={setShowInventory}
           onItemClick={handleItemClick}
-          onSellItems={handleSellItems} 
+          onSellItems={handleSellItems}
+          equipment={equipment}
         />
       </div>
       <div className="Stats-container-wrapper">
@@ -518,13 +555,17 @@ function Game() {
           items={inventory}
           onClose={() => setShowInventory(false)}
           onItemClick={handleItemClick}
-          onSellItems={handleSellItems} 
+          onSellItems={handleSellItems}
+          equipment={equipment}
         />
       )}
       {selectedItem && (
         <ItemPopup
           item={selectedItem}
           onClose={closeItemPopup}
+          onEquipItem={handleEquipItem}
+          onUnequipItem={handleUnequipItem} 
+          equipment={equipment} 
         />
       )}
       {showIntroPopup && (

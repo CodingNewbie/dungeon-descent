@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Inventory from './Inventory';
 import '../../styles/game/HeroStatus.css';
 
-const HeroStatus = ({ name, level, currentXP, requiredXP, gold, inventory, onItemClick, onSellItems }) => {
+const HeroStatus = ({ name, level, currentXP, requiredXP, gold, inventory, onItemClick, onSellItems, equipment }) => {
   const [showInventory, setShowInventory] = useState(false);
   const xpPercentage = (currentXP / requiredXP) * 100;
 
@@ -29,7 +29,8 @@ const HeroStatus = ({ name, level, currentXP, requiredXP, gold, inventory, onIte
           items={inventory}
           onClose={handleCloseInventory}
           onItemClick={onItemClick}
-          onSellItems={onSellItems} 
+          onSellItems={onSellItems}
+          equipment={equipment} 
         />
       )}
     </div>
@@ -44,7 +45,8 @@ HeroStatus.propTypes = {
   gold: PropTypes.number.isRequired,
   inventory: PropTypes.array.isRequired,
   onItemClick: PropTypes.func.isRequired,
-  onSellItems: PropTypes.func.isRequired 
+  onSellItems: PropTypes.func.isRequired,
+  equipment: PropTypes.array.isRequired 
 };
 
 export default HeroStatus;

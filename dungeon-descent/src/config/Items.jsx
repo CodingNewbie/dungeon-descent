@@ -475,7 +475,7 @@ const items = {
   'Mimic Tongue': {
     name: 'Mimic Tongue',
     type: 'tongue',
-    icon: 'ra-tongue',
+    icon: 'ra-tentacle',
     stats: new Stats({ hp: 60, def: 40 }),
     rarity: 'Uncommon',
     price: 100

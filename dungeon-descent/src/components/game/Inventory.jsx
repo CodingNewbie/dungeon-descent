@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import '../../styles/game/Inventory.css';
+import Equipment from './Equipment';
 
 const rarityColors = {
   Common: '#FFFFFF',
@@ -10,21 +11,17 @@ const rarityColors = {
   Legendary: '#FFA500'
 };
 
-const Inventory = ({ items, onClose, onItemClick, onSellItems }) => {
-  const [selectedRarity, setSelectedRarity] = useState('Common');
+const Inventory = ({ items, onClose, onItemClick, onSellItems, equipment }) => {
+  const [selectedRarity, setSelectedRarity] = useState('');
 
   const handleRarityChange = (event) => {
-    setSelectedRarity(event.target.value);
+    const selected = event.target.value;
+    setSelectedRarity(selected);
   };
 
   const handleSell = () => {
     onSellItems(selectedRarity);
   };
-
-  useEffect(() => {
-    const dropdown = document.querySelector('.Inventory-rarity-dropdown');
-    dropdown.style.color = rarityColors[selectedRarity];
-  }, [selectedRarity]);
 
   return (
     <div className="Inventory">
@@ -41,12 +38,9 @@ const Inventory = ({ items, onClose, onItemClick, onSellItems }) => {
             value={selectedRarity}
             onChange={handleRarityChange}
           >
+            <option value="">Select Rarity</option>
             {Object.keys(rarityColors).map((rarity) => (
-              <option
-                key={rarity}
-                value={rarity}
-                className={rarity}
-              >
+              <option key={rarity} value={rarity} style={{ color: rarityColors[rarity] }}>
                 {rarity}
               </option>
             ))}
@@ -54,11 +48,15 @@ const Inventory = ({ items, onClose, onItemClick, onSellItems }) => {
         </div>
         <ul>
           {items.map((item, index) => {
+            console.log('Rendering item:', item);
             return (
               <li
                 key={index}
                 style={{ color: rarityColors[item.rarity] }}
-                onClick={() => onItemClick(item)}
+                onClick={() => {
+                  console.log('Item clicked in Inventory:', item);
+                  onItemClick(item);
+                }}
               >
                 <i className={`ra ${item.icon}`} style={{ color: rarityColors[item.rarity], marginRight: '10px' }}></i>
                 {item.name}
@@ -66,6 +64,7 @@ const Inventory = ({ items, onClose, onItemClick, onSellItems }) => {
             );
           })}
         </ul>
+        <Equipment equipment={equipment} onItemClick={onItemClick} /> {}
       </div>
     </div>
   );
@@ -79,7 +78,8 @@ Inventory.propTypes = {
   })).isRequired,
   onClose: PropTypes.func.isRequired,
   onItemClick: PropTypes.func.isRequired,
-  onSellItems: PropTypes.func.isRequired
+  onSellItems: PropTypes.func.isRequired,
+  equipment: PropTypes.array.isRequired 
 };
 
 export default Inventory;

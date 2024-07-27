@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import '../../styles/game/MonsterImage.css';
 
 
-
 const MonsterImage = ({ type, status, animation, isHit }) => {
   const imageSrc = status === 'dead'
     ? `./images/monsters/${type}-death.gif`
