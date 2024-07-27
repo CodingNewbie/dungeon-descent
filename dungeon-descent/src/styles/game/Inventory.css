@@ -30,13 +30,18 @@
   padding-inline: 10px;
   padding-bottom: 10px;
   border-radius: 5px;
-  z-index: 1001; 
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; 
 }
 
 .Inventory-content ul {
   list-style-type: none;
   padding: 0;
   margin: 0;
+  flex-grow: 1; 
+  overflow-y: auto; 
 }
 
 .Inventory-content li {
