@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/dungeon-descent/static/css/main.b3c85e5e.css",
-    "main.js": "/dungeon-descent/static/js/main.b6f37d11.js",
+    "main.js": "/dungeon-descent/static/js/main.865b6e5e.js",
     "static/js/453.ec0a8669.chunk.js": "/dungeon-descent/static/js/453.ec0a8669.chunk.js",
     "static/media/background.png": "/dungeon-descent/static/media/background.ad7c69d7074f8a1f6a59.png",
     "static/media/rpgawesome-webfont.svg?v=0.1.0": "/dungeon-descent/static/media/rpgawesome-webfont.4f724738b005f669850f.svg",
@@ -21,11 +21,11 @@
     "static/media/fa-v4compatibility.woff2": "/dungeon-descent/static/media/fa-v4compatibility.cf7f5903d06b79ad60f1.woff2",
     "index.html": "/dungeon-descent/index.html",
     "main.b3c85e5e.css.map": "/dungeon-descent/static/css/main.b3c85e5e.css.map",
-    "main.b6f37d11.js.map": "/dungeon-descent/static/js/main.b6f37d11.js.map",
+    "main.865b6e5e.js.map": "/dungeon-descent/static/js/main.865b6e5e.js.map",
     "453.ec0a8669.chunk.js.map": "/dungeon-descent/static/js/453.ec0a8669.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.b3c85e5e.css",
-    "static/js/main.b6f37d11.js"
+    "static/js/main.865b6e5e.js"
   ]
 }
