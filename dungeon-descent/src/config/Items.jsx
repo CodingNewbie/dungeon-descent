@@ -559,7 +559,7 @@ const items = {
   'Reaper Cloth': {
     name: 'Reaper Cloth',
     type: 'cloth',
-    icon: 'ra-scroll-unfurled',
+    icon: 'ra-vest',
     stats: new Stats({ hp: 70, def: 60 }),
     rarity: 'Uncommon',
     price: 140

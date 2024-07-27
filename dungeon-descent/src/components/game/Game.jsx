@@ -99,6 +99,7 @@ function Game() {
         ...prevEvents,
         `Sold ${rarityOrItem.name} for ${rarityOrItem.price} gold.`
       ]);
+      closeItemPopup(); // Close the popup after selling an individual item
     }
   };
 
@@ -424,7 +425,6 @@ function Game() {
       console.log('Error playing background audio:', error);
     });
   };
-  
 
   useEffect(() => {
     if (!lockedChest && !foundDoor && !monsterEncounter && !popupVisible) {
@@ -565,6 +565,7 @@ function Game() {
           onClose={closeItemPopup}
           onEquipItem={handleEquipItem}
           onUnequipItem={handleUnequipItem} 
+          onSellItem={handleSellItems} 
           equipment={equipment} 
         />
       )}

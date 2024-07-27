@@ -15,14 +15,14 @@ const formatStat = (stat) => {
   return `${formattedStat}+`;
 };
 
-const ItemPopup = ({ item, onClose, onEquipItem, onUnequipItem, equipment }) => {
+const ItemPopup = ({ item, onClose, onEquipItem, onUnequipItem, onSellItem, equipment }) => {
   if (!item) {
-    return null; 
+    return null;
   }
 
   const stats = item.stats ? Object.entries(item.stats.getStats ? item.stats.getStats() : item.stats) : [];
-  const isEquipped = equipment.includes(item); 
-  
+  const isEquipped = equipment.includes(item);
+
   return (
     <div className="ItemPopup">
       <div className="ItemPopup-overlay" onClick={onClose}></div>
@@ -50,7 +50,7 @@ const ItemPopup = ({ item, onClose, onEquipItem, onUnequipItem, equipment }) => 
           ) : (
             <button onClick={() => onEquipItem(item)}>Equip</button>
           )}
-          <button>
+          <button onClick={() => onSellItem(item)}>
             <i className="fa-solid fa-coins" style={{ color: '#FFD43B' }}></i>
             {item.price}
           </button>
@@ -71,8 +71,9 @@ ItemPopup.propTypes = {
   }).isRequired,
   onClose: PropTypes.func.isRequired,
   onEquipItem: PropTypes.func.isRequired,
-  onUnequipItem: PropTypes.func.isRequired, 
-  equipment: PropTypes.array.isRequired 
+  onUnequipItem: PropTypes.func.isRequired,
+  onSellItem: PropTypes.func.isRequired,
+  equipment: PropTypes.array.isRequired
 };
 
 export default ItemPopup;
