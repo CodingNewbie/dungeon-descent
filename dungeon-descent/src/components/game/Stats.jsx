@@ -106,6 +106,34 @@ class Stats {
   getBonusCDmg() {
     return this.bonusCDmg;
   }
+
+  getTotalHp() {
+    return this.hp + this.bonusHp;
+  }
+
+  getTotalAtk() {
+    return this.atk + this.bonusAtk;
+  }
+
+  getTotalDef() {
+    return this.def + this.bonusDef;
+  }
+
+  getTotalAtkSpd() {
+    return this.atkSpd + this.bonusAtkSpd;
+  }
+
+  getTotalVamp() {
+    return this.vamp + this.bonusVamp;
+  }
+
+  getTotalCRate() {
+    return this.cRate + this.bonusCRate;
+  }
+
+  getTotalCDmg() {
+    return this.cDmg + this.bonusCDmg;
+  }
 }
 
 const StatsDisplay = ({ stats }) => {

@@ -35,7 +35,7 @@ function Game() {
   const [floor, setFloor] = useState(new Floor());
   const [heroStats, setHeroStats] = useState(new Stats({
     hp: 10000,
-    atk: 20,
+    atk: 150,
     def: 10,
     atkSpd: 1.5,
     vamp: 5,
@@ -59,7 +59,7 @@ function Game() {
   const [monsterEncounter, setMonsterEncounter] = useState(null);
   const [popupVisible, setPopupVisible] = useState(false);
   const [combatLogs, setCombatLogs] = useState([]);
-  const [heroHealth, setHeroHealth] = useState(heroStats.getHp());
+  const [heroHealth, setHeroHealth] = useState(character.getHp());
   const [monsterHealth, setMonsterHealth] = useState(0);
   const [monsterStats, setMonsterStats] = useState(new Stats());
   const [monsterStatus, setMonsterStatus] = useState('alive');
@@ -130,15 +130,8 @@ function Game() {
       });
 
       setInventory(prevInventory => prevInventory.filter(invItem => invItem !== item));
-      setHeroStats(prevStats => {
-        const newStats = { ...prevStats };
-        const itemStats = item.stats;
-        Object.keys(itemStats).forEach(stat => {
-          newStats[`bonus${stat.charAt(0).toUpperCase() + stat.slice(1)}`] += itemStats[stat];
-        });
-        return new Stats(newStats);
-      });
       setSelectedItem(null);
+      incrementHeroStats(item.stats); // Directly pass item.stats
     } else {
       console.log('No empty slot available to equip the item.');
     }
@@ -153,15 +146,46 @@ function Game() {
     });
 
     setInventory(prevInventory => [...prevInventory, item]);
-    setHeroStats(prevStats => {
-      const newStats = { ...prevStats };
-      const itemStats = item.stats;
-      Object.keys(itemStats).forEach(stat => {
-        newStats[`bonus${stat.charAt(0).toUpperCase() + stat.slice(1)}`] -= itemStats[stat];
-      });
-      return new Stats(newStats);
-    });
     setSelectedItem(null);
+    decrementHeroStats(item.stats); // Directly pass item.stats
+  };
+
+  const incrementHeroStats = (stats) => {
+    setHeroStats(prevStats => new Stats({
+      hp: prevStats.getHp(),
+      atk: prevStats.getAtk(),
+      def: prevStats.getDef(),
+      atkSpd: prevStats.getAtkSpd(),
+      vamp: prevStats.getVamp(),
+      cRate: prevStats.getCRate(),
+      cDmg: prevStats.getCDmg(),
+      bonusHp: prevStats.getBonusHp() + (stats.hp || 0),
+      bonusAtk: prevStats.getBonusAtk() + (stats.atk || 0),
+      bonusDef: prevStats.getBonusDef() + (stats.def || 0),
+      bonusAtkSpd: prevStats.getBonusAtkSpd() + (stats.atkSpd || 0),
+      bonusVamp: prevStats.getBonusVamp() + (stats.vamp || 0),
+      bonusCRate: prevStats.getBonusCRate() + (stats.cRate || 0),
+      bonusCDmg: prevStats.getBonusCDmg() + (stats.cDmg || 0)
+    }));
+  };
+
+  const decrementHeroStats = (stats) => {
+    setHeroStats(prevStats => new Stats({
+      hp: prevStats.getHp(),
+      atk: prevStats.getAtk(),
+      def: prevStats.getDef(),
+      atkSpd: prevStats.getAtkSpd(),
+      vamp: prevStats.getVamp(),
+      cRate: prevStats.getCRate(),
+      cDmg: prevStats.getCDmg(),
+      bonusHp: prevStats.getBonusHp() - (stats.hp || 0),
+      bonusAtk: prevStats.getBonusAtk() - (stats.atk || 0),
+      bonusDef: prevStats.getBonusDef() - (stats.def || 0),
+      bonusAtkSpd: prevStats.getBonusAtkSpd() - (stats.atkSpd || 0),
+      bonusVamp: prevStats.getBonusVamp() - (stats.vamp || 0),
+      bonusCRate: prevStats.getBonusCRate() - (stats.cRate || 0),
+      bonusCDmg: prevStats.getBonusCDmg() - (stats.cDmg || 0)
+    }));
   };
 
   useEffect(() => {
@@ -177,8 +201,8 @@ function Game() {
   }, [combatLogs, popupVisible]);
 
   useEffect(() => {
-    setHeroHealth(heroStats.getHp());
-  }, [heroStats]);
+    setHeroHealth(character.getHp());
+  }, [character]);
 
   const handleChestOpen = () => {
     const roll = Math.random();
@@ -281,29 +305,60 @@ function Game() {
     }
   }, [characterTurn]);
 
+  const calculateDamage = (atk, def) => {
+    const baseDamage = Math.max(atk - def, 1); // Ensure a minimum base damage of 1
+    const variance = baseDamage * 0.2; // ±20% variance
+    const damage = baseDamage + (Math.random() * (2 * variance) - variance);
+    return Math.max(Math.round(damage), 0); // Ensure damage is not negative and rounded
+  };
+  
   const handleHeroTurn = () => {
     console.log("Hero move");
-    const newHealth = applyHeroDamage();
+    const heroTotalAtk = heroStats.getTotalAtk();
+    const monsterTotalDef = monsterStats.getTotalDef();
+    const damage = calculateDamage(heroTotalAtk, monsterTotalDef);
+    const newHealth = monsterHealth - damage;
     handleMonsterHealth(newHealth);
-
+  
     if (newHealth <= 0) {
       handleMonsterDefeat();
     } else {
       setCharacterTurn(2);
     }
   };
-
-  const applyHeroDamage = () => {
-    const newHealth = monsterHealth - 200;
-    setIsMonsterHit(true);
-    setTimeout(() => setIsMonsterHit(false), 200);
-    setCombatLogs((prevLogs) => [...prevLogs, `You dealt 200 damage to the ${monsterType}.`]);
-    return newHealth;
+  
+  const handleMonsterTurn = () => {
+    console.log("Monster move");
+    setMonsterAnimation('attack');
+    const monsterTotalAtk = monsterStats.getTotalAtk();
+    const heroTotalDef = heroStats.getTotalDef();
+    const damage = calculateDamage(monsterTotalAtk, heroTotalDef);
+    const newHealth = heroHealth - damage;
+    handleHeroHealth(newHealth);
+  
+    if (newHealth <= 0) {
+      handleHeroDeath();
+    } else {
+      setCharacterTurn(1);
+    }
+  
+    resetMonsterAnimation();
   };
 
   const handleMonsterHealth = (newHealth) => {
+    const damage = monsterHealth - newHealth;
     setMonsterHealth(newHealth);
+    setIsMonsterHit(true);
+    setTimeout(() => setIsMonsterHit(false), 200);
+    setCombatLogs((prevLogs) => [...prevLogs, `You dealt ${damage} damage to the ${monsterType}.`]);
   };
+  
+  const handleHeroHealth = (newHealth) => {
+    const damage = heroHealth - newHealth;
+    setHeroHealth(newHealth);
+    setCombatLogs((prevLogs) => [...prevLogs, `${monsterType} dealt ${damage} damage to you.`]);
+  };
+  
 
   const updateHeroXP = () => {
     setHeroXP(prevXP => {
@@ -374,31 +429,6 @@ function Game() {
     }
   };
 
-  const handleMonsterTurn = () => {
-    console.log("Monster move");
-    setMonsterAnimation('attack');
-    const newHealth = applyMonsterDamage();
-    handleHeroHealth(newHealth);
-
-    if (newHealth <= 0) {
-      handleHeroDeath();
-    } else {
-      setCharacterTurn(1);
-    }
-
-    resetMonsterAnimation();
-  };
-
-  const applyMonsterDamage = () => {
-    const newHealth = heroHealth - 100;
-    setCombatLogs((prevLogs) => [...prevLogs, `${monsterType} dealt 100 damage to you.`]);
-    return newHealth;
-  };
-
-  const handleHeroHealth = (newHealth) => {
-    setHeroHealth(newHealth);
-  };
-
   const handleHeroDeath = () => {
     setCombatLogs((prevLogs) => [...prevLogs, 'You have died.']);
     setCharacterTurn(0);
@@ -446,7 +476,7 @@ function Game() {
     setDroppedLoot([]);
     setPopupVisible(false);
     setMonsterEncounter(null);
-    setHeroHealth(heroStats.getHp());
+    setHeroHealth(character.getHp());
     setMonsterHealth(monsterStats.getHp());
     setMonsterStatus('alive');
     setMonsterAnimation('idle');
@@ -569,7 +599,7 @@ function Game() {
             name: character.name,
             level: heroLevel,
             currentHealth: heroHealth,
-            totalHealth: heroStats.getHp(),
+            totalHealth: character.getHp(),
           }}
           combatLogs={combatLogs}
           onClaimReward={handleClaimReward}
