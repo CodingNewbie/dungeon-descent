@@ -1,0 +1,42 @@
+
+
+each ontheir own branch
+push branch
+
+
+# User 1
+craete the pull request source: main   branc:user1'sbranchname
+merge into main
+
+
+
+# User 2
+git pull 
+fix merge issues (if any)
+push
+create the pull request
+merge request request
+
+
+
+
+
+### IMPORTANT
+once you merge your pull request, you should abandon your local branch
+
+git checkout main
+git pull main    (will main witl all your changes)
+
+# create another branch
+git checkout -b name/feature
+
+
+
+# Delete local branch
+git branch -D <name>
+
+# DELETE remote branch
+do it on github
+
+
+
