@@ -29,6 +29,9 @@ const NavContent = styled.div`
 const Logo = styled.div`
     font-size: 1.5rem;
     font-weight: bold;
+    font-family: 'Tiny5';
+    border: 4px dashed #9a7063;
+    padding: 20px;
 `;
 
 const NavLinks = styled.div`
@@ -46,7 +49,7 @@ const NavLink = styled(Link)`
     transition: color 0.3s ease;
 
     &:hover {
-        color: #fff;
+        color: #9a7063;
     }
 
     &::before {

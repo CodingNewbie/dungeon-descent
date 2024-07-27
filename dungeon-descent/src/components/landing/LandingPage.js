@@ -24,6 +24,7 @@ function LandingPage() {
                     style={{
                         backgroundImage: `url(${foreground})`,
                         backgroundSize: 'cover',
+                        backgroundPosition: 'center',
                     }}
                 />
 
