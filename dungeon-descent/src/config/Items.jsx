@@ -138,8 +138,8 @@ const items = {
   },
   'Shade Cloth': {
     name: 'Shade Cloth',
-    type: 'cloth',
-    icon: 'ra-cloth',
+    type: 'ra-vest',
+    icon: 'ra-vest',
     stats: new Stats({ hp: 70, def: 60 }),
     rarity: 'Uncommon',
     price: 140
@@ -155,7 +155,7 @@ const items = {
   'Dreadshade Ring': {
     name: 'Dreadshade Ring',
     type: 'ring',
-    icon: 'ra-ring',
+    icon: 'ra-fire-ring',
     stats: new Stats({ hp: 120, def: 90, atk: 40 }),
     rarity: 'Epic',
     price: 480
@@ -197,7 +197,7 @@ const items = {
   'Goblin King’s Ring': {
     name: 'Goblin King’s Ring',
     type: 'ring',
-    icon: 'ra-ring',
+    icon: 'ra-fire-ring',
     stats: new Stats({ hp: 100, def: 60, atk: 30 }),
     rarity: 'Epic',
     price: 400
@@ -575,7 +575,7 @@ const items = {
   'Veilreaper Ring': {
     name: 'Veilreaper Ring',
     type: 'ring',
-    icon: 'ra-ring',
+    icon: 'ra-fire-ring',
     stats: new Stats({ hp: 130, def: 90, atk: 60 }),
     rarity: 'Epic',
     price: 480

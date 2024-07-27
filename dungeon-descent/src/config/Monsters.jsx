@@ -304,7 +304,7 @@ const monsters = [
     ]
   },
   {
-    type: 'Thralik the Unyielding',
+    type: 'Thalrik the Unyielding',
     probability: 0.2,
     isBoss: true,
     xp: 350,

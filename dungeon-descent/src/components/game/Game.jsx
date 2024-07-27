@@ -99,7 +99,7 @@ function Game() {
         ...prevEvents,
         `Sold ${rarityOrItem.name} for ${rarityOrItem.price} gold.`
       ]);
-      closeItemPopup(); // Close the popup after selling an individual item
+      closeItemPopup(); 
     }
   };
 
