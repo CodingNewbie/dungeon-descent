@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { createCharacter } from './Character';
 import Floor from './Floor';
 import { Stats, StatsDisplay, BonusStatsDisplay } from './Stats';
@@ -20,6 +21,7 @@ import '../../styles/game/InfoContainer.css';
 import '../../styles/game/StatsContainer.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import IntroPopup from './IntroPopup';
+import debounce from 'lodash.debounce';
 
 const rarityColors = {
   Common: '#FFFFFF',
@@ -29,7 +31,10 @@ const rarityColors = {
   Legendary: '#FFA500'
 };
 
+const STATES_URL = `${process.env.REACT_APP_BACKEND_HOST}/states`;
+
 function Game() {
+  const [hasLoadedFromBackend, setHasLoadedFromBackend] = useState(false);
   const [events, setEvents] = useState([]);
   const [character, setCharacter] = useState(createCharacter('Khor'));
   const [floor, setFloor] = useState(new Floor());
@@ -81,6 +86,7 @@ function Game() {
   const [selectedItem, setSelectedItem] = useState(null); 
   const [equipment, setEquipment] = useState(new Array(6).fill(null)); 
 
+  const navigate = useNavigate();
   const backgroundAudioRef = useRef(null);
   const combatAudioRef = useRef(null);
   const bossAudioRef = useRef(null);
@@ -131,7 +137,7 @@ function Game() {
 
       setInventory(prevInventory => prevInventory.filter(invItem => invItem !== item));
       setSelectedItem(null);
-      incrementHeroStats(item.stats); // Directly pass item.stats
+      incrementHeroStats(item.stats);
     } else {
       console.log('No empty slot available to equip the item.');
     }
@@ -147,7 +153,7 @@ function Game() {
 
     setInventory(prevInventory => [...prevInventory, item]);
     setSelectedItem(null);
-    decrementHeroStats(item.stats); // Directly pass item.stats
+    decrementHeroStats(item.stats); 
   };
 
   const incrementHeroStats = (stats) => {
@@ -203,6 +209,93 @@ function Game() {
   useEffect(() => {
     setHeroHealth(character.getHp());
   }, [character]);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+
+    const getStates = async () => {
+      try {
+        const response = await fetch(STATES_URL, {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`, 
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Response status: ${response.status}`);
+        } 
+
+        const states = await response.json();
+        setHasLoadedFromBackend(true);
+        if(states.currentFloor) setCurrentFloor(states.currentFloor);
+        if(states.currentRoom) setCurrentRoom(states.currentRoom);
+        if(states.gold) setGold(states.gold);
+        if(states.heroLevel) setHeroLevel(states.heroLevel);
+        if(states.heroXP) setHeroXP(states.heroXP);
+        if(states.requiredXP) setRequiredXP(states.requiredXP);
+        if(states.inventory) setInventory(states.inventory);
+        if(states.equipment) setEquipment(states.equipment);
+        if(states.heroStats) setHeroStats(new Stats(states.heroStats));
+        if(states.monsterStats) setMonsterStats(new Stats(states.monsterStats));
+        console.log(states);
+      } catch (error) {
+        console.error(error.message);
+        localStorage.removeItem('token'); // Remove invalid token
+        navigate('/login');
+      }
+    };
+
+    getStates();
+  }, [navigate]);
+
+  const debouncedSaveStates = useCallback(debounce(async (states) => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    try {
+      const response = await fetch(STATES_URL, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`, 
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(states),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Response status: ${response.status}`);
+      }
+
+      console.log("Saved states successfully.");
+    } catch (error) {
+      console.error(error.message);
+    }
+  }, 3000), []);
+
+  useEffect(() => {
+    const states = {
+      heroStats, 
+      currentFloor, 
+      currentRoom, 
+      monsterStats, 
+      heroXP, 
+      requiredXP, 
+      heroLevel, 
+      gold, 
+      inventory, 
+      equipment
+    };
+    
+    if (hasLoadedFromBackend) {
+      debouncedSaveStates(states);
+    }
+  }, [hasLoadedFromBackend, currentFloor, currentRoom, equipment, gold, heroLevel, heroStats, heroXP, inventory, monsterStats, requiredXP, debouncedSaveStates]);
 
   const handleChestOpen = () => {
     const roll = Math.random();
@@ -306,10 +399,10 @@ function Game() {
   }, [characterTurn]);
 
   const calculateDamage = (atk, def) => {
-    const baseDamage = Math.max(atk - def, 1); // Ensure a minimum base damage of 1
-    const variance = baseDamage * 0.2; // ±20% variance
+    const baseDamage = Math.max(atk - def, 1); 
+    const variance = baseDamage * 0.2; 
     const damage = baseDamage + (Math.random() * (2 * variance) - variance);
-    return Math.max(Math.round(damage), 0); // Ensure damage is not negative and rounded
+    return Math.max(Math.round(damage), 0); 
   };
   
   const handleHeroTurn = () => {
@@ -358,7 +451,6 @@ function Game() {
     setHeroHealth(newHealth);
     setCombatLogs((prevLogs) => [...prevLogs, `${monsterType} dealt ${damage} damage to you.`]);
   };
-  
 
   const updateHeroXP = () => {
     setHeroXP(prevXP => {
@@ -533,20 +625,17 @@ function Game() {
       <header className="App-header">
         <h1>Dungeon Descent</h1>
       </header>
-      <div className="Hero-status-container">
-        <HeroStatus
-          name={character.name}
-          level={heroLevel}
-          currentXP={heroXP}
-          requiredXP={requiredXP}
-          gold={gold}
-          inventory={inventory}
-          setShowInventory={setShowInventory}
-          onItemClick={handleItemClick}
-          onSellItems={handleSellItems}
-          equipment={equipment}
-        />
-      </div>
+      <HeroStatus
+        name={character.name}
+        level={heroLevel}
+        currentXP={heroXP}
+        requiredXP={requiredXP}
+        gold={gold}
+        inventory={inventory}
+        onItemClick={handleItemClick}
+        onSellItems={handleSellItems}
+        equipment={equipment}
+      />
       <div className="Stats-container-wrapper">
         <StatsDisplay stats={heroStats} />
         <BonusStatsDisplay stats={heroStats} />
