@@ -15,21 +15,21 @@ class Stats {
     bonusCRate = 0,
     bonusCDmg = 0
   } = {}) {
-    this.hp = hp;
-    this.atk = atk;
-    this.def = def;
-    this.atkSpd = atkSpd;
-    this.vamp = vamp;
-    this.cRate = cRate;
-    this.cDmg = cDmg;
+    this.hp = Math.round(hp);
+    this.atk = Math.round(atk);
+    this.def = Math.round(def);
+    this.atkSpd = Math.round(atkSpd);
+    this.vamp = Math.round(vamp);
+    this.cRate = Math.round(cRate);
+    this.cDmg = Math.round(cDmg);
 
-    this.bonusHp = bonusHp;
-    this.bonusAtk = bonusAtk;
-    this.bonusDef = bonusDef;
-    this.bonusAtkSpd = bonusAtkSpd;
-    this.bonusVamp = bonusVamp;
-    this.bonusCRate = bonusCRate;
-    this.bonusCDmg = bonusCDmg;
+    this.bonusHp = Math.round(bonusHp);
+    this.bonusAtk = Math.round(bonusAtk);
+    this.bonusDef = Math.round(bonusDef);
+    this.bonusAtkSpd = Math.round(bonusAtkSpd);
+    this.bonusVamp = Math.round(bonusVamp);
+    this.bonusCRate = Math.round(bonusCRate);
+    this.bonusCDmg = Math.round(bonusCDmg);
   }
 
   getStats() {
@@ -108,31 +108,31 @@ class Stats {
   }
 
   getTotalHp() {
-    return this.hp + this.bonusHp;
+    return Math.round(this.hp + this.bonusHp);
   }
 
   getTotalAtk() {
-    return this.atk + this.bonusAtk;
+    return Math.round(this.atk + this.bonusAtk);
   }
 
   getTotalDef() {
-    return this.def + this.bonusDef;
+    return Math.round(this.def + this.bonusDef);
   }
 
   getTotalAtkSpd() {
-    return this.atkSpd + this.bonusAtkSpd;
+    return Math.round(this.atkSpd + this.bonusAtkSpd);
   }
 
   getTotalVamp() {
-    return this.vamp + this.bonusVamp;
+    return Math.round(this.vamp + this.bonusVamp);
   }
 
   getTotalCRate() {
-    return this.cRate + this.bonusCRate;
+    return Math.round(this.cRate + this.bonusCRate);
   }
 
   getTotalCDmg() {
-    return this.cDmg + this.bonusCDmg;
+    return Math.round(this.cDmg + this.bonusCDmg);
   }
 }
 

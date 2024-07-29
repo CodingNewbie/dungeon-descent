@@ -1,0 +1,59 @@
+.LevelUpPopup {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -75%);
+    background-color: black;
+    padding: 10px;
+    width: 380px;
+    border: 1px solid white;
+    border-radius: 10px;
+    color: white;
+    z-index: 1001; /* Higher than the overlay */
+  }
+  
+  .LevelUpPopup h2 {
+    text-align: center;
+  }
+  
+  .LevelUpPopup button {
+    display: block;
+    background-color: black;
+    color: white;
+    border: 1px solid white;
+    width: 100%;
+    margin: 10px 0;
+    padding: 5px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .LevelUpPopup button:hover {
+    background-color: white;
+    color: black;
+  }
+  
+  .LevelUpPopup .reroll-button {
+    width: auto;
+  }
+  
+  .Overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000; /* Lower than the popup */
+  }
+  
+  .LevelUpOptions strong {
+    font-size: 18px;
+  }
+  
+  .LevelUpOptions button:disabled {
+    background-color: #888;
+  }
+  

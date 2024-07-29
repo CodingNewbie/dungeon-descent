@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { createCharacter } from './Character';
 import Floor from './Floor';
 import { Stats, StatsDisplay, BonusStatsDisplay } from './Stats';
@@ -10,6 +9,7 @@ import DoorInteraction from './interactions/DoorInteraction';
 import MonsterInteraction from './interactions/MonsterInteraction';
 import Inventory from './Inventory';
 import ItemPopup from './ItemPopup';
+import LevelUpPopup from './LevelUpPopup';
 import { handleEvent } from '../../utils/gameUtils';
 import selectMonster from '../../utils/selectMonster';
 import selectLoot from '../../utils/selectLoot';
@@ -20,8 +20,8 @@ import '../../styles/game/EventsContainer.css';
 import '../../styles/game/InfoContainer.css';
 import '../../styles/game/StatsContainer.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import IntroPopup from './IntroPopup';
 import debounce from 'lodash.debounce';
+import IntroPopup from './IntroPopup';
 
 const rarityColors = {
   Common: '#FFFFFF',
@@ -32,6 +32,9 @@ const rarityColors = {
 };
 
 const STATES_URL = `${process.env.REACT_APP_BACKEND_HOST}/states`;
+const token = localStorage.getItem('token');
+
+console.log("API Token:", token); 
 
 function Game() {
   const [hasLoadedFromBackend, setHasLoadedFromBackend] = useState(false);
@@ -83,10 +86,12 @@ function Game() {
   const [characterTurn, setCharacterTurn] = useState(0);
   const [showIntroPopup, setShowIntroPopup] = useState(true);
   const [lootFound, setLootFound] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(null); 
-  const [equipment, setEquipment] = useState(new Array(6).fill(null)); 
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [equipment, setEquipment] = useState(new Array(6).fill(null));
+  const [showLevelUpPopup, setShowLevelUpPopup] = useState(false);
+  const [levelUpOptions, setLevelUpOptions] = useState([]);
+  const [rerollCount, setRerollCount] = useState(2);
 
-  const navigate = useNavigate();
   const backgroundAudioRef = useRef(null);
   const combatAudioRef = useRef(null);
   const bossAudioRef = useRef(null);
@@ -120,7 +125,7 @@ function Game() {
         ...prevEvents,
         `Sold ${rarityOrItem.name} for ${rarityOrItem.price} gold.`
       ]);
-      closeItemPopup(); 
+      closeItemPopup();
     }
   };
 
@@ -137,7 +142,7 @@ function Game() {
 
       setInventory(prevInventory => prevInventory.filter(invItem => invItem !== item));
       setSelectedItem(null);
-      incrementHeroStats(item.stats);
+      incrementBonusStats(item.stats);
     } else {
       console.log('No empty slot available to equip the item.');
     }
@@ -153,10 +158,10 @@ function Game() {
 
     setInventory(prevInventory => [...prevInventory, item]);
     setSelectedItem(null);
-    decrementHeroStats(item.stats); 
+    decrementBonusStats(item.stats);
   };
 
-  const incrementHeroStats = (stats) => {
+  const incrementBonusStats = (stats) => {
     setHeroStats(prevStats => new Stats({
       hp: prevStats.getHp(),
       atk: prevStats.getAtk(),
@@ -175,7 +180,7 @@ function Game() {
     }));
   };
 
-  const decrementHeroStats = (stats) => {
+  const decrementBonusStats = (stats) => {
     setHeroStats(prevStats => new Stats({
       hp: prevStats.getHp(),
       atk: prevStats.getAtk(),
@@ -211,25 +216,19 @@ function Game() {
   }, [character]);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      navigate('/login');
-      return;
-    }
-
     const getStates = async () => {
       try {
         const response = await fetch(STATES_URL, {
           method: "GET",
           headers: {
-            "Authorization": `Bearer ${token}`, 
+            "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         });
 
         if (!response.ok) {
           throw new Error(`Response status: ${response.status}`);
-        } 
+        }
 
         const states = await response.json();
         setHasLoadedFromBackend(true);
@@ -246,23 +245,18 @@ function Game() {
         console.log(states);
       } catch (error) {
         console.error(error.message);
-        localStorage.removeItem('token'); // Remove invalid token
-        navigate('/login');
       }
     };
 
     getStates();
-  }, [navigate]);
+  }, []);
 
   const debouncedSaveStates = useCallback(debounce(async (states) => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
-
     try {
       const response = await fetch(STATES_URL, {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${token}`, 
+          "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(states),
@@ -276,22 +270,22 @@ function Game() {
     } catch (error) {
       console.error(error.message);
     }
-  }, 3000), []);
+  }, 3000), [token]);
 
   useEffect(() => {
     const states = {
-      heroStats, 
-      currentFloor, 
-      currentRoom, 
-      monsterStats, 
-      heroXP, 
-      requiredXP, 
-      heroLevel, 
-      gold, 
-      inventory, 
+      heroStats,
+      currentFloor,
+      currentRoom,
+      monsterStats,
+      heroXP,
+      requiredXP,
+      heroLevel,
+      gold,
+      inventory,
       equipment
     };
-    
+
     if (hasLoadedFromBackend) {
       debouncedSaveStates(states);
     }
@@ -399,12 +393,12 @@ function Game() {
   }, [characterTurn]);
 
   const calculateDamage = (atk, def) => {
-    const baseDamage = Math.max(atk - def, 1); 
-    const variance = baseDamage * 0.2; 
+    const baseDamage = Math.max(atk - def, 1);
+    const variance = baseDamage * 0.2;
     const damage = baseDamage + (Math.random() * (2 * variance) - variance);
-    return Math.max(Math.round(damage), 0); 
+    return Math.max(Math.round(damage), 0);
   };
-  
+
   const handleHeroTurn = () => {
     console.log("Hero move");
     const heroTotalAtk = heroStats.getTotalAtk();
@@ -412,14 +406,14 @@ function Game() {
     const damage = calculateDamage(heroTotalAtk, monsterTotalDef);
     const newHealth = monsterHealth - damage;
     handleMonsterHealth(newHealth);
-  
+
     if (newHealth <= 0) {
       handleMonsterDefeat();
     } else {
       setCharacterTurn(2);
     }
   };
-  
+
   const handleMonsterTurn = () => {
     console.log("Monster move");
     setMonsterAnimation('attack');
@@ -428,13 +422,13 @@ function Game() {
     const damage = calculateDamage(monsterTotalAtk, heroTotalDef);
     const newHealth = heroHealth - damage;
     handleHeroHealth(newHealth);
-  
+
     if (newHealth <= 0) {
       handleHeroDeath();
     } else {
       setCharacterTurn(1);
     }
-  
+
     resetMonsterAnimation();
   };
 
@@ -445,7 +439,7 @@ function Game() {
     setTimeout(() => setIsMonsterHit(false), 200);
     setCombatLogs((prevLogs) => [...prevLogs, `You dealt ${damage} damage to the ${monsterType}.`]);
   };
-  
+
   const handleHeroHealth = (newHealth) => {
     const damage = heroHealth - newHealth;
     setHeroHealth(newHealth);
@@ -458,6 +452,8 @@ function Game() {
       if (newXP >= requiredXP) {
         setHeroLevel(prevLevel => prevLevel + 1);
         setRequiredXP(prev => prev + 100);
+        setShowLevelUpPopup(true); // Show level up popup
+        setLevelUpOptions(generateLevelUpOptions()); // Generate new options
         return newXP - requiredXP;
       }
       return newXP;
@@ -534,7 +530,7 @@ function Game() {
     setCombatLogs(['Combat begins!']);
     backgroundAudioRef.current.pause();
     if (monsterType === 'gorehoof-the-ravager') {
-      bossAudioRef.current.currentTime = 0; 
+      bossAudioRef.current.currentTime = 0;
       bossAudioRef.current.play().catch((error) => {
         console.log('Error playing boss audio:', error);
       });
@@ -564,7 +560,7 @@ function Game() {
     } else {
       handleEvent(setEvents, 'You claimed the reward. There was no loot.', MAX_EVENTS);
     }
-  
+
     setDroppedLoot([]);
     setPopupVisible(false);
     setMonsterEncounter(null);
@@ -602,7 +598,7 @@ function Game() {
             setMonsterXP(monster.xp);
             setMonsterGold(monster.gold);
             setMonsterStats(monster.stats);
-            setMonsterHealth(monster.stats.getHp()); 
+            setMonsterHealth(monster.stats.getHp());
             setMonsterEncounter(`You encountered a ${monster.type.charAt(0).toUpperCase() + monster.type.slice(1)}`);
           } else {
             console.error('Monster or monster stats not found:', monster);
@@ -619,6 +615,32 @@ function Game() {
       return () => clearInterval(interval);
     }
   }, [floor, lockedChest, foundDoor, monsterEncounter, popupVisible]);
+
+  const generateLevelUpOptions = () => {
+    const options = [
+      { label: 'HP UP', description: 'Increase bonus HP by 12%', increase: () => setHeroStats((prevStats) => new Stats({ ...prevStats, hp: prevStats.getHp() * 1.12 })) },
+      { label: 'ATK UP', description: 'Increase bonus ATK by 8%', increase: () => setHeroStats((prevStats) => new Stats({ ...prevStats, atk: prevStats.getAtk() * 1.08 })) },
+      { label: 'DEF UP', description: 'Increase bonus DEF by 8%', increase: () => setHeroStats((prevStats) => new Stats({ ...prevStats, def: prevStats.getDef() * 1.08 })) },
+      { label: 'ATK.SPD UP', description: 'Increase bonus ATK.SPD by 3%', increase: () => setHeroStats((prevStats) => new Stats({ ...prevStats, atkSpd: prevStats.getAtkSpd() * 1.03 })) },
+      { label: 'VAMP UP', description: 'Increase bonus VAMP by 2%', increase: () => setHeroStats((prevStats) => new Stats({ ...prevStats, vamp: prevStats.getVamp() * 1.02 })) },
+      { label: 'C.RATE UP', description: 'Increase bonus C.RATE by 1%', increase: () => setHeroStats((prevStats) => new Stats({ ...prevStats, cRate: prevStats.getCRate() * 1.01 })) },
+      { label: 'C.DMG UP', description: 'Increase bonus C.DMG by 6%', increase: () => setHeroStats((prevStats) => new Stats({ ...prevStats, cDmg: prevStats.getCDmg() * 1.06 })) },
+    ];
+    const shuffledOptions = options.sort(() => Math.random() - 0.5);
+    return shuffledOptions.slice(0, 3);
+  };
+
+  const handleLevelUp = (option) => {
+    option.increase();
+    setShowLevelUpPopup(false);
+  };
+
+  const handleReroll = () => {
+    if (rerollCount > 0) {
+      setRerollCount(rerollCount - 1);
+      setLevelUpOptions(generateLevelUpOptions());
+    }
+  };
 
   return (
     <div className="Game">
@@ -714,9 +736,9 @@ function Game() {
           item={selectedItem}
           onClose={closeItemPopup}
           onEquipItem={handleEquipItem}
-          onUnequipItem={handleUnequipItem} 
-          onSellItem={handleSellItems} 
-          equipment={equipment} 
+          onUnequipItem={handleUnequipItem}
+          onSellItem={handleSellItems}
+          equipment={equipment}
         />
       )}
       {showIntroPopup && (
@@ -727,6 +749,14 @@ function Game() {
             console.log('Error playing background audio on load:', error);
           });
         }} />
+      )}
+      {showLevelUpPopup && (
+        <LevelUpPopup
+          levelUpOptions={levelUpOptions}
+          handleStatIncrease={handleLevelUp}
+          handleReroll={handleReroll}
+          rerollCount={rerollCount}
+        />
       )}
       <audio ref={backgroundAudioRef} src="./audio/background.ogg" loop />
       <audio ref={combatAudioRef} src="./audio/battle.ogg" />
