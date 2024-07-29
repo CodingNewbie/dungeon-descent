@@ -26,10 +26,13 @@ export const AuthProvider = ({ children }) => {
         setCurrentUser(user);
       } catch (error) {
         console.error('Error fetching current user:', error);
+        setCurrentUser(null); 
       }
     };
 
-    fetchCurrentUser();
+    if (localStorage.getItem('token')) {
+      fetchCurrentUser();
+    }
   }, []);
 
   return (

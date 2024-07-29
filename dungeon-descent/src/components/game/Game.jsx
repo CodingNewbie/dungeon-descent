@@ -36,6 +36,27 @@ const token = localStorage.getItem('token');
 
 console.log("API Token:", token);
 
+const saveStates = async (states, token) => {
+  try {
+    const response = await fetch(STATES_URL, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(states),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Response status: ${response.status}`);
+    }
+
+    console.log("Saved states successfully.");
+  } catch (error) {
+    console.error(error.message);
+  }
+};
+
 function Game() {
   const [hasLoadedFromBackend, setHasLoadedFromBackend] = useState(false);
   const [events, setEvents] = useState([]);
@@ -251,26 +272,10 @@ function Game() {
     getStates();
   }, []);
 
-  const debouncedSaveStates = useCallback(debounce(async (states) => {
-    try {
-      const response = await fetch(STATES_URL, {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(states),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Response status: ${response.status}`);
-      }
-
-      console.log("Saved states successfully.");
-    } catch (error) {
-      console.error(error.message);
-    }
-  }, 3000), [token]);
+  const debouncedSaveStates = useCallback(
+    debounce((states) => saveStates(states, token), 3000),
+    [token]
+  );
 
   useEffect(() => {
     const states = {
@@ -417,8 +422,8 @@ function Game() {
     const { damage, isCritical } = calculateDamage(heroTotalAtk, monsterTotalDef, heroCRate, heroCDmg);
     const vampHealing = Math.round(damage * (heroStats.getTotalVamp() / 100));
     setHeroHealth((prevHealth) => Math.min(Math.round(prevHealth + vampHealing), heroStats.getTotalHp()));
-    const newHealth = Math.max(monsterHealth - damage, 0); // Ensure health doesn't go below 0
-    handleMonsterHealth(newHealth);
+    const newHealth = Math.max(monsterHealth - damage, 0); 
+    handleMonsterHealth(newHealth, damage, isCritical);
   
     if (newHealth <= 0) {
       handleMonsterDefeat();
@@ -433,8 +438,8 @@ function Game() {
     const monsterTotalAtk = monsterStats.getTotalAtk();
     const heroTotalDef = heroStats.getTotalDef();
     const { damage, isCritical } = calculateDamage(monsterTotalAtk, heroTotalDef, monsterStats.getTotalCRate(), monsterStats.getTotalCDmg());
-    const newHealth = Math.max(heroHealth - damage, 0); // Ensure health doesn't go below 0
-    handleHeroHealth(newHealth);
+    const newHealth = Math.max(heroHealth - damage, 0); 
+    handleHeroHealth(newHealth, damage, isCritical);
   
     if (newHealth <= 0) {
       handleHeroDeath();
@@ -446,20 +451,22 @@ function Game() {
   };
   
   
-  const handleMonsterHealth = (newHealth) => {
-    const roundedHealth = Math.round(newHealth);
-    const damage = Math.round(monsterHealth - roundedHealth);
-    setMonsterHealth(roundedHealth);
+  const handleMonsterHealth = (newHealth, damage, isCritical) => {
+    setMonsterHealth(newHealth);
     setIsMonsterHit(true);
     setTimeout(() => setIsMonsterHit(false), 200);
-    setCombatLogs((prevLogs) => [...prevLogs, `You dealt ${damage} damage to the ${monsterType}.`]);
+    setCombatLogs((prevLogs) => [
+      ...prevLogs,
+      `You dealt ${damage} ${isCritical ? 'crit ' : ''}damage to the ${monsterType}.`
+    ]);
   };
   
-  const handleHeroHealth = (newHealth) => {
-    const roundedHealth = Math.round(newHealth);
-    const damage = Math.round(heroHealth - roundedHealth);
-    setHeroHealth(roundedHealth);
-    setCombatLogs((prevLogs) => [...prevLogs, `${monsterType} dealt ${damage} damage to you.`]);
+  const handleHeroHealth = (newHealth, damage, isCritical) => {
+    setHeroHealth(newHealth);
+    setCombatLogs((prevLogs) => [
+      ...prevLogs,
+      `${monsterType} dealt ${damage} ${isCritical ? 'crit ' : ''}damage to you.`
+    ]);
   };
   
 
@@ -469,8 +476,8 @@ function Game() {
       if (newXP >= requiredXP) {
         setHeroLevel(prevLevel => prevLevel + 1);
         setRequiredXP(prev => prev + 100);
-        setShowLevelUpPopup(true); // Show level up popup
-        setLevelUpOptions(generateLevelUpOptions()); // Generate new options
+        setShowLevelUpPopup(true); 
+        setLevelUpOptions(generateLevelUpOptions()); 
         return newXP - requiredXP;
       }
       return newXP;

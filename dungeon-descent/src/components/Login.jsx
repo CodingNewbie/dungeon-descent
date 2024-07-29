@@ -1,33 +1,38 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const { setCurrentUser } = useAuth();
 
   const login = async (e) => {
     e.preventDefault();
     try {
+      const requestData = { username, password };
+      console.log('Sending login request with data:', requestData);
+
       const response = await fetch(`${process.env.REACT_APP_BACKEND_HOST}/dj-rest-auth/login/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, password }), // Use username instead of email
+        body: JSON.stringify(requestData), 
       });
 
       const data = await response.json();
+      console.log('Login response:', data);
 
       if (!response.ok) {
         throw new Error(data.detail || 'Login failed');
       }
 
       localStorage.setItem('token', data.access);
+      setCurrentUser(data.user); 
       console.log('User logged in successfully:', data);
-
-      // Redirect to game screen after successful login
       navigate('/game');
     } catch (error) {
       setError(error.message);

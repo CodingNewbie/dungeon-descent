@@ -5,6 +5,7 @@ import Game from './components/game/Game';
 import Register from './components/Register';
 import Login from './components/Login';
 import PrivateRoute from './components/PrivateRoute';
+import { AuthProvider } from './contexts/AuthContext';
 import './styles/game/App.css';
 import './styles/landing/LandingPage.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
@@ -12,23 +13,25 @@ import 'rpg-awesome/css/rpg-awesome.min.css';
 
 function App() {
   return (
-    <Router basename="/dungeon-descent">
-      <div className="App">
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/login" element={<Login />} />
-          <Route
-            path="/game"
-            element={
-              <PrivateRoute>
-                <Game />
-              </PrivateRoute>
-            }
-          />
-        </Routes>
-      </div>
-    </Router>
+    <AuthProvider>
+      <Router basename="/dungeon-descent">
+        <div className="App">
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/login" element={<Login />} />
+            <Route
+              path="/game"
+              element={
+                <PrivateRoute>
+                  <Game />
+                </PrivateRoute>
+              }
+            />
+          </Routes>
+        </div>
+      </Router>
+    </AuthProvider>
   );
 }
 
