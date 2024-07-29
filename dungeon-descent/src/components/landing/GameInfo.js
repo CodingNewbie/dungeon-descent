@@ -2,7 +2,7 @@ import React from "react";
 
 function GameInfo() {
     return (
-        <div className="game-info">
+        <div className="game-info" id="info">
             <h2>Game Information</h2>
             <div className="game-description">
                 <p>In Descent, players embark on a thrilling journey through a series of increasingly challenging dungeons. Your character is equipped with stats for health, weapons, armor, and a variety of inventory items, all of which can be upgraded and customized as you progress.</p>
