@@ -34,7 +34,7 @@ const rarityColors = {
 const STATES_URL = `${process.env.REACT_APP_BACKEND_HOST}/states`;
 const token = localStorage.getItem('token');
 
-console.log("API Token:", token); 
+console.log("API Token:", token);
 
 function Game() {
   const [hasLoadedFromBackend, setHasLoadedFromBackend] = useState(false);
@@ -392,59 +392,83 @@ function Game() {
     }
   }, [characterTurn]);
 
-  const calculateDamage = (atk, def) => {
+  const calculateDamage = (atk, def, cRate, cDmg) => {
     const baseDamage = Math.max(atk - def, 1);
     const variance = baseDamage * 0.2;
-    const damage = baseDamage + (Math.random() * (2 * variance) - variance);
-    return Math.max(Math.round(damage), 0);
+    let damage = baseDamage + (Math.random() * (2 * variance) - variance);
+  
+    const isCritical = Math.random() < (cRate / 100);
+    if (isCritical) {
+      damage *= (1 + (cDmg / 100));
+    }
+  
+    return {
+      damage: Math.max(Math.round(damage), 0),
+      isCritical
+    };
   };
-
+  
   const handleHeroTurn = () => {
     console.log("Hero move");
     const heroTotalAtk = heroStats.getTotalAtk();
     const monsterTotalDef = monsterStats.getTotalDef();
-    const damage = calculateDamage(heroTotalAtk, monsterTotalDef);
+    const heroCRate = heroStats.getTotalCRate();
+    const heroCDmg = heroStats.getTotalCDmg();
+  
+    const { damage, isCritical } = calculateDamage(heroTotalAtk, monsterTotalDef, heroCRate, heroCDmg);
+    const vampHealing = damage * (heroStats.getTotalVamp() / 100);
+    setHeroHealth((prevHealth) => Math.min(prevHealth + vampHealing, heroStats.getTotalHp()));
     const newHealth = monsterHealth - damage;
-    handleMonsterHealth(newHealth);
-
+    handleMonsterHealth(newHealth, isCritical);
+  
     if (newHealth <= 0) {
       handleMonsterDefeat();
     } else {
       setCharacterTurn(2);
     }
   };
-
+  
   const handleMonsterTurn = () => {
     console.log("Monster move");
     setMonsterAnimation('attack');
     const monsterTotalAtk = monsterStats.getTotalAtk();
     const heroTotalDef = heroStats.getTotalDef();
-    const damage = calculateDamage(monsterTotalAtk, heroTotalDef);
+    const monsterCRate = monsterStats.getTotalCRate();
+    const monsterCDmg = monsterStats.getTotalCDmg();
+  
+    const { damage, isCritical } = calculateDamage(monsterTotalAtk, heroTotalDef, monsterCRate, monsterCDmg);
     const newHealth = heroHealth - damage;
-    handleHeroHealth(newHealth);
-
+    handleHeroHealth(newHealth, isCritical);
+  
     if (newHealth <= 0) {
       handleHeroDeath();
     } else {
       setCharacterTurn(1);
     }
-
+  
     resetMonsterAnimation();
   };
-
-  const handleMonsterHealth = (newHealth) => {
+  
+  const handleMonsterHealth = (newHealth, isCritical) => {
     const damage = monsterHealth - newHealth;
     setMonsterHealth(newHealth);
     setIsMonsterHit(true);
     setTimeout(() => setIsMonsterHit(false), 200);
-    setCombatLogs((prevLogs) => [...prevLogs, `You dealt ${damage} damage to the ${monsterType}.`]);
+    setCombatLogs((prevLogs) => [
+      ...prevLogs, 
+      `You dealt ${damage} ${isCritical ? 'crit ' : ''}damage to the ${monsterType}.`
+    ]);
   };
-
-  const handleHeroHealth = (newHealth) => {
+  
+  const handleHeroHealth = (newHealth, isCritical) => {
     const damage = heroHealth - newHealth;
     setHeroHealth(newHealth);
-    setCombatLogs((prevLogs) => [...prevLogs, `${monsterType} dealt ${damage} damage to you.`]);
+    setCombatLogs((prevLogs) => [
+      ...prevLogs, 
+      `${monsterType} dealt ${damage} ${isCritical ? 'crit ' : ''}damage to you.`
+    ]);
   };
+  
 
   const updateHeroXP = () => {
     setHeroXP(prevXP => {
@@ -618,13 +642,13 @@ function Game() {
 
   const generateLevelUpOptions = () => {
     const options = [
-      { label: 'HP UP', description: 'Increase bonus HP by 12%', increase: () => setHeroStats((prevStats) => new Stats({ ...prevStats, hp: prevStats.getHp() * 1.12 })) },
-      { label: 'ATK UP', description: 'Increase bonus ATK by 8%', increase: () => setHeroStats((prevStats) => new Stats({ ...prevStats, atk: prevStats.getAtk() * 1.08 })) },
-      { label: 'DEF UP', description: 'Increase bonus DEF by 8%', increase: () => setHeroStats((prevStats) => new Stats({ ...prevStats, def: prevStats.getDef() * 1.08 })) },
-      { label: 'ATK.SPD UP', description: 'Increase bonus ATK.SPD by 3%', increase: () => setHeroStats((prevStats) => new Stats({ ...prevStats, atkSpd: prevStats.getAtkSpd() * 1.03 })) },
-      { label: 'VAMP UP', description: 'Increase bonus VAMP by 2%', increase: () => setHeroStats((prevStats) => new Stats({ ...prevStats, vamp: prevStats.getVamp() * 1.02 })) },
-      { label: 'C.RATE UP', description: 'Increase bonus C.RATE by 1%', increase: () => setHeroStats((prevStats) => new Stats({ ...prevStats, cRate: prevStats.getCRate() * 1.01 })) },
-      { label: 'C.DMG UP', description: 'Increase bonus C.DMG by 6%', increase: () => setHeroStats((prevStats) => new Stats({ ...prevStats, cDmg: prevStats.getCDmg() * 1.06 })) },
+      { label: 'HP UP', description: 'Increase HP by 12%', increase: () => setHeroStats((prevStats) => new Stats({ ...prevStats, hp: Math.round(prevStats.getHp() * 1.12) })) },
+      { label: 'ATK UP', description: 'Increase ATK by 8%', increase: () => setHeroStats((prevStats) => new Stats({ ...prevStats, atk: Math.round(prevStats.getAtk() * 1.08) })) },
+      { label: 'DEF UP', description: 'Increase DEF by 8%', increase: () => setHeroStats((prevStats) => new Stats({ ...prevStats, def: Math.round(prevStats.getDef() * 1.08) })) },
+      { label: 'ATK.SPD UP', description: 'Increase ATK.SPD by 3%', increase: () => setHeroStats((prevStats) => new Stats({ ...prevStats, atkSpd: Math.round(prevStats.getAtkSpd() * 1.03) })) },
+      { label: 'VAMP UP', description: 'Increase VAMP by 2%', increase: () => setHeroStats((prevStats) => new Stats({ ...prevStats, vamp: Math.round(prevStats.getVamp() * 1.02) })) },
+      { label: 'C.RATE UP', description: 'Increase C.RATE by 1%', increase: () => setHeroStats((prevStats) => new Stats({ ...prevStats, cRate: Math.round(prevStats.getCRate() * 1.01) })) },
+      { label: 'C.DMG UP', description: 'Increase C.DMG by 6%', increase: () => setHeroStats((prevStats) => new Stats({ ...prevStats, cDmg: Math.round(prevStats.getCDmg() * 1.06) })) },
     ];
     const shuffledOptions = options.sort(() => Math.random() - 0.5);
     return shuffledOptions.slice(0, 3);
@@ -738,7 +762,6 @@ function Game() {
           onEquipItem={handleEquipItem}
           onUnequipItem={handleUnequipItem}
           onSellItem={handleSellItems}
-          equipment={equipment}
         />
       )}
       {showIntroPopup && (
