@@ -131,7 +131,7 @@ function Game() {
 
   const handleEquipItem = (item) => {
     console.log('Equipping item:', item);
-
+  
     const firstEmptySlot = equipment.findIndex(slot => slot === null);
     if (firstEmptySlot !== -1) {
       setEquipment(prevEquipment => {
@@ -139,7 +139,7 @@ function Game() {
         newEquipment[firstEmptySlot] = item;
         return newEquipment;
       });
-
+  
       setInventory(prevInventory => prevInventory.filter(invItem => invItem !== item));
       setSelectedItem(null);
       incrementBonusStats(item.stats);
@@ -147,20 +147,20 @@ function Game() {
       console.log('No empty slot available to equip the item.');
     }
   };
-
+  
   const handleUnequipItem = (item) => {
     console.log('Unequipping item:', item);
-
+  
     setEquipment(prevEquipment => {
       const newEquipment = prevEquipment.map(slot => (slot === item ? null : slot));
       return newEquipment;
     });
-
+  
     setInventory(prevInventory => [...prevInventory, item]);
     setSelectedItem(null);
     decrementBonusStats(item.stats);
   };
-
+  
   const incrementBonusStats = (stats) => {
     setHeroStats(prevStats => new Stats({
       hp: prevStats.getHp(),
@@ -179,7 +179,7 @@ function Game() {
       bonusCDmg: prevStats.getBonusCDmg() + (stats.cDmg || 0)
     }));
   };
-
+  
   const decrementBonusStats = (stats) => {
     setHeroStats(prevStats => new Stats({
       hp: prevStats.getHp(),
@@ -198,7 +198,7 @@ function Game() {
       bonusCDmg: prevStats.getBonusCDmg() - (stats.cDmg || 0)
     }));
   };
-
+  
   useEffect(() => {
     if (eventsEndRef.current) {
       eventsEndRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -762,6 +762,7 @@ function Game() {
           onEquipItem={handleEquipItem}
           onUnequipItem={handleUnequipItem}
           onSellItem={handleSellItems}
+          equipment={equipment}
         />
       )}
       {showIntroPopup && (

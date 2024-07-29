@@ -15,13 +15,13 @@ const formatStat = (stat) => {
   return `${formattedStat}+`;
 };
 
-const ItemPopup = ({ item, onClose, onEquipItem, onUnequipItem, onSellItem, equipment }) => {
+const ItemPopup = ({ item, onClose, onEquipItem, onUnequipItem, onSellItem, equipment = [] }) => {
   if (!item) {
     return null;
   }
 
   const stats = item.stats ? Object.entries(item.stats.getStats ? item.stats.getStats() : item.stats) : [];
-  const isEquipped = equipment.includes(item);
+  const isEquipped = equipment.some(equipItem => equipItem && equipItem.name === item.name);
 
   return (
     <div className="ItemPopup">
