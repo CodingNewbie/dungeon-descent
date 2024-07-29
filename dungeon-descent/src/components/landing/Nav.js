@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import { Link as ScrollLink } from 'react-scroll';
 import '../../styles/landing/Nav.css';
 
 function Nav() {
@@ -11,9 +10,9 @@ function Nav() {
             </div>
 
             <div className='nav-links'>
-                <ScrollLink to='about' smooth={true} duration={500} className='nav-link'>About</ScrollLink>
-                <ScrollLink to='info' smooth={true} duration={500} className='nav-link'>Game Info</ScrollLink>
-                <ScrollLink to='community' smooth={true} duration={500} className='nav-link'>Community</ScrollLink>
+                <a href='#about' className='nav-link'>About</a>
+                <a href='#info' className='nav-link'>Game Info</a>
+                <a href='#community' className='nav-link'>Community</a>
             </div>
         </nav>
     );

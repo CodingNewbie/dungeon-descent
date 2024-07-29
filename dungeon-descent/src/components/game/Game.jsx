@@ -428,13 +428,12 @@ function Game() {
     if (newHealth <= 0) {
       handleMonsterDefeat();
     } else {
-      setCharacterTurn(2);
+      setTimeout(() => setCharacterTurn(2), 1000);
     }
   };
   
   const handleMonsterTurn = () => {
     console.log("Monster move");
-    setMonsterAnimation('attack');
     const monsterTotalAtk = monsterStats.getTotalAtk();
     const heroTotalDef = heroStats.getTotalDef();
     const { damage, isCritical } = calculateDamage(monsterTotalAtk, heroTotalDef, monsterStats.getTotalCRate(), monsterStats.getTotalCDmg());
@@ -444,12 +443,11 @@ function Game() {
     if (newHealth <= 0) {
       handleHeroDeath();
     } else {
-      setCharacterTurn(1);
+      setTimeout(() => setCharacterTurn(1), 1000); 
     }
   
     resetMonsterAnimation();
   };
-  
   
   const handleMonsterHealth = (newHealth, damage, isCritical) => {
     setMonsterHealth(newHealth);
