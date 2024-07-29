@@ -414,12 +414,11 @@ function Game() {
     const monsterTotalDef = monsterStats.getTotalDef();
     const heroCRate = heroStats.getTotalCRate();
     const heroCDmg = heroStats.getTotalCDmg();
-  
     const { damage, isCritical } = calculateDamage(heroTotalAtk, monsterTotalDef, heroCRate, heroCDmg);
-    const vampHealing = damage * (heroStats.getTotalVamp() / 100);
-    setHeroHealth((prevHealth) => Math.min(prevHealth + vampHealing, heroStats.getTotalHp()));
-    const newHealth = monsterHealth - damage;
-    handleMonsterHealth(newHealth, isCritical);
+    const vampHealing = Math.round(damage * (heroStats.getTotalVamp() / 100));
+    setHeroHealth((prevHealth) => Math.min(Math.round(prevHealth + vampHealing), heroStats.getTotalHp()));
+    const newHealth = Math.max(monsterHealth - damage, 0); // Ensure health doesn't go below 0
+    handleMonsterHealth(newHealth);
   
     if (newHealth <= 0) {
       handleMonsterDefeat();
@@ -433,12 +432,9 @@ function Game() {
     setMonsterAnimation('attack');
     const monsterTotalAtk = monsterStats.getTotalAtk();
     const heroTotalDef = heroStats.getTotalDef();
-    const monsterCRate = monsterStats.getTotalCRate();
-    const monsterCDmg = monsterStats.getTotalCDmg();
-  
-    const { damage, isCritical } = calculateDamage(monsterTotalAtk, heroTotalDef, monsterCRate, monsterCDmg);
-    const newHealth = heroHealth - damage;
-    handleHeroHealth(newHealth, isCritical);
+    const { damage, isCritical } = calculateDamage(monsterTotalAtk, heroTotalDef, monsterStats.getTotalCRate(), monsterStats.getTotalCDmg());
+    const newHealth = Math.max(heroHealth - damage, 0); // Ensure health doesn't go below 0
+    handleHeroHealth(newHealth);
   
     if (newHealth <= 0) {
       handleHeroDeath();
@@ -449,24 +445,21 @@ function Game() {
     resetMonsterAnimation();
   };
   
-  const handleMonsterHealth = (newHealth, isCritical) => {
-    const damage = monsterHealth - newHealth;
-    setMonsterHealth(newHealth);
+  
+  const handleMonsterHealth = (newHealth) => {
+    const roundedHealth = Math.round(newHealth);
+    const damage = Math.round(monsterHealth - roundedHealth);
+    setMonsterHealth(roundedHealth);
     setIsMonsterHit(true);
     setTimeout(() => setIsMonsterHit(false), 200);
-    setCombatLogs((prevLogs) => [
-      ...prevLogs, 
-      `You dealt ${damage} ${isCritical ? 'crit ' : ''}damage to the ${monsterType}.`
-    ]);
+    setCombatLogs((prevLogs) => [...prevLogs, `You dealt ${damage} damage to the ${monsterType}.`]);
   };
   
-  const handleHeroHealth = (newHealth, isCritical) => {
-    const damage = heroHealth - newHealth;
-    setHeroHealth(newHealth);
-    setCombatLogs((prevLogs) => [
-      ...prevLogs, 
-      `${monsterType} dealt ${damage} ${isCritical ? 'crit ' : ''}damage to you.`
-    ]);
+  const handleHeroHealth = (newHealth) => {
+    const roundedHealth = Math.round(newHealth);
+    const damage = Math.round(heroHealth - roundedHealth);
+    setHeroHealth(roundedHealth);
+    setCombatLogs((prevLogs) => [...prevLogs, `${monsterType} dealt ${damage} damage to you.`]);
   };
   
 
