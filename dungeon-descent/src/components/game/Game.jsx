@@ -324,7 +324,7 @@ function Game() {
     setMonsterAnimation('idle');
     setCombatLogs([]);
     setPopupVisible(true);
-    handleCombatPhase(selectedMonster.type);
+    handleCombatPhase(selectedMonster);
   }, []);
 
   const resetChestState = () => {
@@ -548,10 +548,12 @@ function Game() {
     setTimeout(() => setMonsterAnimation('idle'), 500);
   };
 
-  const handleCombatPhase = (monsterType) => {
+  const handleCombatPhase = (monster) => {
+    console.log('Starting combat phase with monster:', monster);
+    console.log('Is boss:', monster.isBoss);
     setCombatLogs(['Combat begins!']);
     backgroundAudioRef.current.pause();
-    if (monsterType === 'gorehoof-the-ravager') {
+    if (monster.isBoss) {
       bossAudioRef.current.currentTime = 0;
       bossAudioRef.current.play().catch((error) => {
         console.log('Error playing boss audio:', error);
