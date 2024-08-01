@@ -642,17 +642,17 @@ function Game() {
 
   const generateLevelUpOptions = () => {
     const options = [
-      { label: 'HP UP', description: 'Increase HP by 12%', increase: () => setHeroStats((prevStats) => new Stats({ ...prevStats, hp: Math.round(prevStats.getHp() * 1.12) })) },
-      { label: 'ATK UP', description: 'Increase ATK by 8%', increase: () => setHeroStats((prevStats) => new Stats({ ...prevStats, atk: Math.round(prevStats.getAtk() * 1.08) })) },
-      { label: 'DEF UP', description: 'Increase DEF by 8%', increase: () => setHeroStats((prevStats) => new Stats({ ...prevStats, def: Math.round(prevStats.getDef() * 1.08) })) },
-      { label: 'ATK.SPD UP', description: 'Increase ATK.SPD by 3%', increase: () => setHeroStats((prevStats) => new Stats({ ...prevStats, atkSpd: Math.round(prevStats.getAtkSpd() * 1.03) })) },
-      { label: 'VAMP UP', description: 'Increase VAMP by 2%', increase: () => setHeroStats((prevStats) => new Stats({ ...prevStats, vamp: Math.round(prevStats.getVamp() * 1.02) })) },
-      { label: 'C.RATE UP', description: 'Increase C.RATE by 1%', increase: () => setHeroStats((prevStats) => new Stats({ ...prevStats, cRate: Math.round(prevStats.getCRate() * 1.01) })) },
-      { label: 'C.DMG UP', description: 'Increase C.DMG by 6%', increase: () => setHeroStats((prevStats) => new Stats({ ...prevStats, cDmg: Math.round(prevStats.getCDmg() * 1.06) })) },
+      { label: 'HP UP', description: 'Increase HP by 12%', increase: () => setHeroStats((prevStats) => new Stats({ ...prevStats, hp: prevStats.getHp() * 1.12 })) },
+      { label: 'ATK UP', description: 'Increase ATK by 8%', increase: () => setHeroStats((prevStats) => new Stats({ ...prevStats, atk: prevStats.getAtk() * 1.08 })) },
+      { label: 'DEF UP', description: 'Increase DEF by 8%', increase: () => setHeroStats((prevStats) => new Stats({ ...prevStats, def: prevStats.getDef() * 1.08 })) },
+      { label: 'ATK.SPD UP', description: 'Increase ATK.SPD by 3%', increase: () => setHeroStats((prevStats) => new Stats({ ...prevStats, atkSpd: prevStats.getAtkSpd() * 1.03 })) },
+      { label: 'VAMP UP', description: 'Increase VAMP by 2%', increase: () => setHeroStats((prevStats) => new Stats({ ...prevStats, vamp: prevStats.getVamp() * 1.02 })) },
+      { label: 'C.RATE UP', description: 'Increase C.RATE by 1%', increase: () => setHeroStats((prevStats) => new Stats({ ...prevStats, cRate: prevStats.getCRate() + 1 })) },
+      { label: 'C.DMG UP', description: 'Increase C.DMG by 6%', increase: () => setHeroStats((prevStats) => new Stats({ ...prevStats, cDmg: prevStats.getCDmg() + 6 })) },
     ];
     const shuffledOptions = options.sort(() => Math.random() - 0.5);
     return shuffledOptions.slice(0, 3);
-  };
+  };  
 
   const handleLevelUp = (option) => {
     option.increase();
