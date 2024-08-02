@@ -666,9 +666,15 @@ function Game() {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('token'); 
+    window.location.href = '/dungeon-descent/login';
+  };
+
   return (
     <div className="Game">
       <header className="App-header">
+        <button onClick={handleLogout}>Logout</button>
         <h1>Dungeon Descent</h1>
       </header>
       <HeroStatus

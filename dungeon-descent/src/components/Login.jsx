@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import '../styles/Login.css'; 
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -41,29 +42,31 @@ const Login = () => {
   };
 
   return (
-    <div>
-      <h2>Login</h2>
-      <form onSubmit={login}>
-        <input
-          type="text"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          placeholder="Username"
-          required
-        />
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-          required
-        />
-        <button type="submit">Login</button>
-        {error && <p>{error}</p>}
-      </form>
-      <p>
-        Don't have an account? <Link to="/register">Register</Link>
-      </p>
+    <div className="Login">
+      <div className="Login-container">
+        <h2>Dungeon Descent</h2>
+        <form onSubmit={login}>
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="Username"
+            required
+          />
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password"
+            required
+          />
+          <button type="submit">Login</button>
+          {error && <p>{error}</p>}
+        </form>
+        <p>
+          Don't have an account? <Link to="/register">Register</Link>
+        </p>
+      </div>
     </div>
   );
 };
