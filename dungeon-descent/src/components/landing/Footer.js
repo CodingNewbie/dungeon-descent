@@ -8,8 +8,8 @@ function Footer() {
             <div className="footer-content">
                 <div className="footer-section">
                     <h3>Navigation</h3>
-                    <Link to="/game-info" className="footer-link">Game Info</Link>
-                    <Link to="/token" className="footer-link">Token</Link>
+                    <Link to="/" className="footer-link">Home</Link>
+                    <Link to="/game" className="footer-link">Play</Link>
                 </div>
                 <div className="footer-section">
                     <h3>Connect</h3>
