@@ -16,9 +16,9 @@ function GameInfo() {
                     <img src="/dungeon-descent/images/landing/dd1.png" alt="Dungeon Description 1" />
                 </div>
 
-                <div className="info-block reverse">
-                    <p>Throughout your journey, you’ll discover hidden treasures that provide valuable rewards, experience points, and opportunities to level up your character. Enhancing your abilities and gear is essential to surviving the depths and overcoming the formidable final boss.</p>
+                <div className="info-block">
                     <img src="/dungeon-descent/images/landing/dd2.png" alt="Dungeon Description 2" />
+                    <p>Throughout your journey, you’ll discover hidden treasures that provide valuable rewards, experience points, and opportunities to level up your character. Enhancing your abilities and gear is essential to surviving the depths and overcoming the formidable final boss.</p>
                 </div>
             </div>
         </div>
