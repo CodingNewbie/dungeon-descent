@@ -29,7 +29,7 @@ const items = {
   'Beholder Heart': {
     name: 'Beholder Heart',
     type: 'heart',
-    icon: 'ra-heartburn',
+    icon: 'ra-hearts',
     stats: new Stats({ hp: 200, def: 70, atk: 50 }),
     rarity: 'Epic',
     price: 400
@@ -365,7 +365,7 @@ const items = {
   'Mawlurker Heart': {
     name: 'Mawlurker Heart',
     type: 'heart',
-    icon: 'ra-heart',
+    icon: 'ra-hearts',
     stats: new Stats({ hp: 140, def: 90, atk: 60 }),
     rarity: 'Epic',
     price: 480
@@ -491,7 +491,7 @@ const items = {
   'Mimic Heart': {
     name: 'Mimic Heart',
     type: 'heart',
-    icon: 'ra-heart',
+    icon: 'ra-hearts',
     stats: new Stats({ hp: 120, def: 80, atk: 50 }),
     rarity: 'Epic',
     price: 450
@@ -533,7 +533,7 @@ const items = {
   'Rotfang Heart': {
     name: 'Rotfang Heart',
     type: 'heart',
-    icon: 'ra-heart',
+    icon: 'ra-hearts',
     stats: new Stats({ hp: 120, def: 80, atk: 50 }),
     rarity: 'Epic',
     price: 420
@@ -617,7 +617,7 @@ const items = {
   'Vile Heart': {
     name: 'Vile Heart',
     type: 'heart',
-    icon: 'ra-heart',
+    icon: 'ra-hearts',
     stats: new Stats({ hp: 140, def: 100, atk: 70 }),
     rarity: 'Epic',
     price: 480
@@ -659,7 +659,7 @@ const items = {
   'Vilescale Heart': {
     name: 'Vilescale Heart',
     type: 'heart',
-    icon: 'ra-heart',
+    icon: 'ra-hearts',
     stats: new Stats({ hp: 150, def: 110, atk: 60 }),
     rarity: 'Epic',
     price: 480
