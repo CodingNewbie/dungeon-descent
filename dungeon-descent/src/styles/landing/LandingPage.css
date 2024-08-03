@@ -118,7 +118,7 @@ body {
 
 .info-block img {
   max-width: 300px;
-  margin-right: 20px;
+  margin-inline: 20px;
 }
 
 .info-block p {
