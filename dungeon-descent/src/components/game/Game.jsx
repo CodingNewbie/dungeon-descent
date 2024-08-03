@@ -434,6 +434,7 @@ function Game() {
   
   const handleMonsterTurn = () => {
     console.log("Monster move");
+    setMonsterAnimation('attack');
     const monsterTotalAtk = monsterStats.getTotalAtk();
     const heroTotalDef = heroStats.getTotalDef();
     const { damage, isCritical } = calculateDamage(monsterTotalAtk, heroTotalDef, monsterStats.getTotalCRate(), monsterStats.getTotalCDmg());
