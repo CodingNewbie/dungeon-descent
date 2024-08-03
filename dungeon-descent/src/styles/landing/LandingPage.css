@@ -1,8 +1,10 @@
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   height: 100%;
   font-family: 'Arial', sans-serif;
+  scroll-behavior: smooth;
 }
 
 body {
@@ -16,7 +18,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between; 
+  justify-content: space-between;
   background: linear-gradient(to bottom, #4B3837 0%, #1A1A1A 100%);
 }
 
@@ -26,7 +28,6 @@ body {
   color: white;
 }
 
-/* HERO SECTION */
 .hero-body {
   display: flex;
   justify-content: center;
@@ -74,53 +75,15 @@ body {
   background-color: #9a7063;
 }
 
-/* ABOUT SECTION */
-.LandingPage-about {
+.container {
+  max-width: 1200px;
+  margin-inline: auto;
   display: flex;
-  flex-direction: column;
   justify-content: center;
-  gap: 1rem;
-  margin: 25px;
-  border: 6px dashed #9a7063;
-  border-radius: 8px;
 }
 
-.LandingPage-about h2 {
-  font-family: "Tiny5", sans-serif;
-  font-size: 6rem;
-  color: #9a7063;
-}
-
-.LandingPage-about p {
-  margin: 2rem 6rem;
-  font-family: "Pixelify Sans", sans-serif;
-  font-size: 2rem;
-}
-
-/* GAME INFORMATION */
-.game-info {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 1rem;
-  margin: 25px;
-  border: 6px dashed #9a7063;
-  border-radius: 8px;
-}
-
-.game-info h2 {
-  font-family: "Tiny5", sans-serif;
-  font-size: 6rem;
-  color: #9a7063;
-}
-
-.game-info p {
-  margin: 2rem 6rem;
-  font-family: "Pixelify Sans", sans-serif;
-  font-size: 2rem;
-}
-
-/* COMMUNITY SECTION */
+.LandingPage-about,
+.game-info,
 .LandingPage-community {
   display: flex;
   flex-direction: column;
@@ -131,39 +94,64 @@ body {
   border-radius: 8px;
 }
 
+.LandingPage-about h2,
+.game-info h2,
 .LandingPage-community h2 {
   font-family: "Tiny5", sans-serif;
   font-size: 6rem;
   color: #9a7063;
 }
 
+.LandingPage-about p,
+.game-info p,
 .LandingPage-community p {
   margin: 2rem 6rem;
   font-family: "Pixelify Sans", sans-serif;
   font-size: 2rem;
 }
 
-/* SOCIAL ICONS */
-.social-icons {
+.info-block {
   display: flex;
-  justify-content: center;
-  margin: 1.3rem;
+  align-items: center;
+  margin: 20px 0;
+}
+
+.info-block img {
+  max-width: 300px;
+  margin-right: 20px;
+}
+
+.info-block p {
+  flex: 1;
+}
+
+.info-block.reverse {
+  flex-direction: row-reverse;
+}
+
+.info-block.reverse img {
+  margin-right: 0;
+  margin-left: 20px;
+}
+
+.social-icons {
+  margin: 12px;
 }
 
 .social-icons a {
-  margin: 0 10px;
-  color: black;
-  transition: color 0.3s;
+  margin: 0 .5rem;
   font-size: 1.5rem;
+  color: #9a7063;
 }
 
 .social-icons a:hover {
-  color: rgb(128, 125, 125);
+  margin: 0 .5rem;
+  font-size: 1.5rem;
+  color: #deb8ac;
 }
 
-/* MEDIA QUERIES */
-
 @media (max-width: 1400px) {
+
   .LandingPage-about h2,
   .game-info h2,
   .LandingPage-community h2 {
@@ -183,6 +171,7 @@ body {
 }
 
 @media (max-width: 768px) {
+
   .LandingPage-about h2,
   .game-info h2,
   .LandingPage-community h2 {
@@ -200,9 +189,34 @@ body {
     font-size: 2em;
     margin-top: 40px;
   }
+
+  .info-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .info-block img {
+    margin: 0 0 20px 0;
+    max-width: 100%;
+  }
+
+  .info-block p {
+    margin-bottom: 20px;
+  }
+
+  /* Alternate text and image for mobile view */
+  .info-block:nth-child(odd) {
+    flex-direction: column;
+  }
+
+  .info-block:nth-child(even) {
+    flex-direction: column-reverse;
+  }
 }
 
 @media (max-width: 480px) {
+
   .LandingPage-about h2,
   .game-info h2,
   .LandingPage-community h2 {
@@ -225,5 +239,34 @@ body {
   .social-icons a {
     font-size: 1.2rem;
     margin: 0 5px;
+  }
+
+  .social-icons a:hover {
+    font-size: 1.2rem;
+    margin: 0 5px;
+  }
+
+  .info-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .info-block img {
+    margin: 0 0 20px 0;
+    max-width: 100%;
+  }
+
+  .info-block p {
+    margin-bottom: 20px;
+  }
+
+  /* Alternate text and image for mobile view */
+  .info-block:nth-child(odd) {
+    flex-direction: column;
+  }
+
+  .info-block:nth-child(even) {
+    flex-direction: column-reverse;
   }
 }
